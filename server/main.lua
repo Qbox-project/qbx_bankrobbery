@@ -1,4 +1,4 @@
-QBCore = exports['qb-core']:GetCoreObject()
+QBCore = exports['qbx-core']:GetCoreObject()
 IsABankActive = false
 
 QBCore.Functions.CreateUseableItem('electronickit', function(source)
