@@ -21,7 +21,7 @@ local function StartBankThread()
         while IsInsideZone do
             local WaitTime = 800
             local PlayerCoords = GetEntityCoords(cache.ped)
-            if #(PlayerCoords - vec3(CurrentBank.CashStack.coords.x, CurrentBank.CashStack.coords.y, CurrentBank.CashStack.coords.z)) <= 1.2 and not CurrentBank.CashStack.taken then
+            if #(PlayerCoords - vec3(CurrentBank.CashStack.coords.x, CurrentBank.CashStack.coords.y, CurrentBank.CashStack.coords.z)) <= 1.0 and not CurrentBank.CashStack.taken then
                 WaitTime = 0
                 DrawText3D(CurrentBank.CashStack.coords, Lang:t('text.take_cashstack'))
                 if IsControlJustReleased(0, 38) then
