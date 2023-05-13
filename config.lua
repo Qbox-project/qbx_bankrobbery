@@ -135,7 +135,7 @@ Config.BankLocations = {
         },
         CashStack = {
             taken = false,
-            coords = vector4(1173.4801025390625, 2715.168212890625, 37.91910171508789, 0.0)
+            coords = vector4(-2954.17, 484.53, 15.52, 267.54)
         }
     },
     {
@@ -161,7 +161,7 @@ Config.BankLocations = {
         },
         CashStack = {
             taken = false,
-            coords = vector4(-2954.17, 484.53, 15.52, 267.54)
+            coords = vector4(1173.4801025390625, 2715.168212890625, 37.91910171508789, 0.0)
         }
     }
 }
