@@ -196,13 +196,13 @@ Thermite.Open = function(data) {
 }
 
 Thermite.Failed = function() {
-    if (active) $.post("https://qb-bankrobbery/thermitefailed");
+    if (active) $.post("https://qbx-bankrobbery/thermitefailed");
     active = false;
     Thermite.Close();
 }
 
 Thermite.Success = function() {
-    if (active) $.post("https://qb-bankrobbery/thermitesuccess");
+    if (active) $.post("https://qbx-bankrobbery/thermitesuccess");
     active = false;
     Thermite.Close();
 }
