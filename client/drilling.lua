@@ -9,8 +9,8 @@ local function CheckPins()
         local SoundID = GetSoundId()
         PlaySoundFrontend(SoundID, 'Drill_Pin_Break', 'DLC_HEIST_FLEECA_SOUNDSET', true)
         ReleaseSoundId(SoundID)
-        TempF10 = TempF10 + 1.7
-        SetTemp = SetTemp + 0.7
+        TempF10 = TempF10 + 1.5
+        SetTemp = SetTemp + 0.45
     elseif PinsBroken == 5 then
         Result = true
         ShouldDrawScaleform = false
