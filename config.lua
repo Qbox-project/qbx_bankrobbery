@@ -4,7 +4,11 @@ Config.NotEnoughCopsNotify = true
 
 Config.Fleeca = {
     RequiredPolice = 0,
-    RequiredItems = { 'trojan_usb', 'electronickit' }
+    RequiredItems = { 'trojan_usb', 'electronickit' },
+    LockerActions = {
+        lockpick = { requireditem = 'lockpick', event = 'lockpick' },
+        drill = { requireditem = 'drill', event = 'drill' }
+    }
 }
 
 Config.BankLocations = {
@@ -32,6 +36,13 @@ Config.BankLocations = {
         CashStack = {
             taken = false,
             coords = vector4(312.8111267089844, -287.506103515625, 53.99585723876953, 160.0)
+        },
+        Lockers = {
+            { coords = vector4(314.13, -283.25, 54.14, 342.93), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(315.54, -284.97, 54.14, 257.52), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(311.11, -286.96, 54.14, 73.46), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(312.65, -289.21, 54.14, 161.47), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(314.92, -288.28, 54.14, 250.29), taken = false, action = Config.Fleeca.LockerActions.drill }
         }
     },
     {
@@ -58,6 +69,13 @@ Config.BankLocations = {
         CashStack = {
             taken = false,
             coords = vector4(148.47442626953125, -1049.126220703125, 29.19914054870605, 160.0)
+        },
+        Lockers = {
+            { coords = vector4(149.77, -1044.88, 29.35, 341.57), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(151.22, -1046.57, 29.35, 249.04), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(146.79, -1048.51, 29.35, 74.32), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(148.41, -1050.89, 29.35, 161.06), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(150.33, -1049.84, 29.35, 253.61), taken = false, action = Config.Fleeca.LockerActions.drill }
         }
     },
     {
@@ -84,6 +102,13 @@ Config.BankLocations = {
         CashStack = {
             taken = false,
             coords = vector4(-352.20947265625, -58.33846664428711, 48.86764144897461, 160.0)
+        },
+        Lockers = {
+            { coords = vector4(-351.05, -54.11, 49.01, 341.55), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(-349.5, -55.72, 49.01, 251.98), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(-353.88, -57.72, 49.01, 71.24), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(-352.23, -60.03, 49.01, 164.16), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(-350.07, -59.07, 49.01, 252.18), taken = false, action = Config.Fleeca.LockerActions.drill }
         }
     },
     {
@@ -110,6 +135,13 @@ Config.BankLocations = {
         CashStack = {
             taken = false,
             coords = vector4(-1207.4844970703125, -337.44573974609375, 37.61210250854492, 207.0)
+        },
+        Lockers = {
+            { coords = vector4(-1209.74, -333.63, 37.76, 30.0), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(-1207.43, -333.78, 37.76, 296.86), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(-1209.05, -338.34, 37.76, 123.7), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(-1206.21, -338.68, 37.76, 210.89), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(-1205.57, -336.43, 37.76, 296.59), taken = false, action = Config.Fleeca.LockerActions.drill }
         }
     },
     {
@@ -136,6 +168,13 @@ Config.BankLocations = {
         CashStack = {
             taken = false,
             coords = vector4(-2954.17, 484.53, 15.52, 267.54)
+        },
+        Lockers = {
+            { coords = vector4(-2958.58, 483.94, 15.68, 92.44), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(-2957.46, 485.96, 15.68, 357.69), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(-2953.97, 482.4, 15.68, 177.3), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(-2952.49, 484.34, 15.68, 268.82), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(-2954.19, 486.39, 15.68, 358.71), taken = false, action = Config.Fleeca.LockerActions.drill }
         }
     },
     {
@@ -162,6 +201,13 @@ Config.BankLocations = {
         CashStack = {
             taken = false,
             coords = vector4(1173.4801025390625, 2715.168212890625, 37.91910171508789, 0.0)
+        },
+        Lockers = {
+            { coords = vector4(1173.8, 2710.72, 38.07, 180.15), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(1171.78, 2711.79, 38.07, 88.2), taken = false, action = Config.Fleeca.LockerActions.lockpick },
+            { coords = vector4(1175.18, 2715.35, 38.07, 275.77), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(1173.26, 2716.83, 38.07, 358.18), taken = false, action = Config.Fleeca.LockerActions.drill },
+            { coords = vector4(1171.21, 2715.07, 38.07, 95.88), taken = false, action = Config.Fleeca.LockerActions.drill }
         }
     }
 }

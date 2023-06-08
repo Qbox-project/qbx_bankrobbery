@@ -21,11 +21,20 @@ local function StartBankThread()
         while IsInsideZone do
             local WaitTime = 800
             local PlayerCoords = GetEntityCoords(cache.ped)
-            if #(PlayerCoords - vec3(CurrentBank.CashStack.coords.x, CurrentBank.CashStack.coords.y, CurrentBank.CashStack.coords.z)) <= 1.0 and not CurrentBank.CashStack.taken then
+            if #(PlayerCoords - CurrentBank.CashStack.coords.xyz) <= 0.9 and not CurrentBank.CashStack.taken then
                 WaitTime = 0
                 DrawText3D(CurrentBank.CashStack.coords, Lang:t('text.take_cashstack'))
                 if IsControlJustReleased(0, 38) then
                     TriggerServerEvent('qb-bankrobbery:server:takeCashStack')
+                end
+            end
+            for i = 1, #CurrentBank.Lockers do
+                if #(PlayerCoords - CurrentBank.Lockers[i].coords.xyz) <= 0.8 and not CurrentBank.Lockers[i].taken then
+                    WaitTime = 0
+                    DrawText3D(CurrentBank.Lockers[i].coords.xyz, Lang:t('text.crack_locker'))
+                    if IsControlJustReleased(0, 38) then
+                        TriggerServerEvent('qb-bankrobbery:server:crackLocker')
+                    end
                 end
             end
             Wait(WaitTime)
@@ -140,4 +149,56 @@ lib.callback.register('qb-bankrobbery:callback:startCashStack', function(BagID)
     NetworkAddEntityToSynchronisedScene(Bag, GrabCashEnd, 'anim@scripted@player@mission@tun_table_grab@cash@', 'exit_bag', 1000.0, -1000.0, 0)
     NetworkStartSynchronisedScene(GrabCashEnd)
     return NetworkGetNetworkIdFromEntity(CashStack), GetAnimDuration('anim@scripted@player@mission@tun_table_grab@cash@', 'exit') * 950
+end)
+
+lib.callback.register('qb-bankrobbery:callback:startlockpick', function()
+    LockPicking = promise.new()
+    TaskPlayAnim(cache.ped, 'mini@safe_cracking', 'step_into', 8.0, 8.0, -1, 0, 0.0, false, false, false)
+    Wait(GetAnimDuration('mini@safe_cracking', 'step_into') * 1000)
+    TaskPlayAnim(cache.ped, 'mini@safe_cracking', 'dial_turn_clock_normal', 8.0, 8.0, -1, 1, 0.0, false, false, false)
+    TriggerEvent('SafeCracker:StartMinigame', { math.random(150, 450), math.random(1.0, 100.0), math.random(360, 450), math.random(300.0, 340.0), math.random(350, 400), math.random(320.0, 340.0), math.random(350, 600) }, math.random(7, 15), function(Result)
+        LockPicking:resolve(Result)
+    end)
+    local Result = Citizen.Await(LockPicking)
+    TaskPlayAnim(cache.ped, 'mini@safe_cracking', 'step_out', 8.0, 8.0, -1, 0, 0.0, false, false, false)
+    return Result
+end)
+
+lib.callback.register('qb-bankrobbery:callback:startdrill', function(BagID, DrillID, ClosestLocker)
+    local Bag = NetworkGetEntityFromNetworkId(BagID)
+    local Drill = NetworkGetEntityFromNetworkId(DrillID)
+    local WaitTime
+    SetPedComponentVariation(cache.ped, 5, 0, 0, 0)
+    local Rotation = GetEntityRotation(cache.ped, 2)
+    local DrillEnter = NetworkCreateSynchronisedScene(CurrentBank.Lockers[ClosestLocker].coords.x, CurrentBank.Lockers[ClosestLocker].coords.y, CurrentBank.Lockers[ClosestLocker].coords.z + 0.24, Rotation.x, Rotation.y, Rotation.z, 2, true, false, 1.0, 0.0, 1.0)
+    NetworkAddPedToSynchronisedScene(cache.ped, DrillEnter, 'anim@heists@fleeca_bank@drilling', 'intro', 1000.0, -1.5, 0, 0, 0, 0)
+    NetworkAddEntityToSynchronisedScene(Bag, DrillEnter, 'anim@heists@fleeca_bank@drilling', 'bag_intro', 1000.0, -1.5, 0)
+    NetworkStartSynchronisedScene(DrillEnter)
+    Wait(GetAnimDuration('anim@heists@fleeca_bank@drilling', 'intro') * 1000)
+    local DrillIdle = NetworkCreateSynchronisedScene(CurrentBank.Lockers[ClosestLocker].coords.x, CurrentBank.Lockers[ClosestLocker].coords.y, CurrentBank.Lockers[ClosestLocker].coords.z + 0.24, Rotation.x, Rotation.y, Rotation.z, 2, false, true, 1.0, 0.0, 1.0)
+    NetworkAddPedToSynchronisedScene(cache.ped, DrillIdle, 'anim@heists@fleeca_bank@drilling', 'drill_straight_start', 1000.0, 0.0, 0, 0, 0, 0)
+    NetworkStartSynchronisedScene(DrillIdle)
+    local Result = StartDrillingMinigame(Drill)
+    local DrillOutro = NetworkCreateSynchronisedScene(CurrentBank.Lockers[ClosestLocker].coords.x, CurrentBank.Lockers[ClosestLocker].coords.y, CurrentBank.Lockers[ClosestLocker].coords.z + 0.24, Rotation.x, Rotation.y, Rotation.z, 2, true, false, 1.0, 0.0, 1.0)
+    Wait(600)
+    if Result then
+        NetworkAddPedToSynchronisedScene(cache.ped, DrillOutro, 'anim@heists@fleeca_bank@drilling', 'outro', 1000.0, -8.0, 3341, 16, 1000.0, 0)
+        NetworkAddEntityToSynchronisedScene(Bag, DrillOutro, 'anim@heists@fleeca_bank@drilling', 'bag_outro', 1000.0, -8.0, 0)
+        WaitTime = GetAnimDuration('anim@heists@fleeca_bank@drilling', 'outro') * 1000
+    else
+        NetworkAddPedToSynchronisedScene(cache.ped, DrillOutro, 'anim@heists@fleeca_bank@drilling', 'exit', 1000.0, -8.0, 3341, 16, 1000.0, 0)
+        NetworkAddEntityToSynchronisedScene(Bag, DrillOutro, 'anim@heists@fleeca_bank@drilling', 'bag_exit', 1000.0, -8.0, 0)
+        WaitTime = GetAnimDuration('anim@heists@fleeca_bank@drilling', 'exit') * 1000
+    end
+    NetworkStartSynchronisedScene(DrillOutro)
+    Wait(WaitTime)
+    return Result
+end)
+
+AddStateBagChangeHandler('drillAttachEntity', nil, function(bagName, key, value)
+    local Entity = GetEntityFromStateBagName(bagName)
+    if Entity == 0 then return end
+    if not DoesEntityExist(Entity) then return end
+    if NetworkGetEntityOwner(Entity) ~= cache.playerId then return end
+    AttachEntityToEntity(Entity, GetPlayerPed(GetPlayerFromServerId(value)), GetPedBoneIndex(cache.ped, 28422), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
 end)
