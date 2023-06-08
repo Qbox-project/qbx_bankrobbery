@@ -1,4 +1,4 @@
-local ShouldDrawScaleform, Scaleform, SetSpeed, SetDepth, SetTemp, CurrentDepth, PinsBroken, Result = nil, nil, 0.0, 0.0, 0.0, 0.1, 1, false
+local ShouldDrawScaleform, Scaleform, SetSpeed, SetDepth, SetTemp, CurrentDepth, PinsBroken, Result, DrillObject = nil, nil, 0.0, 0.0, 0.0, 0.1, 1, false, nil
 local TempF9, TempF10, TempF12 = 0.0, 0.0, 0.0
 
 local Pins = { { depth = 0.325 }, { depth = 0.475 }, { depth = 0.625 }, { depth = 0.775 } }
@@ -9,7 +9,7 @@ local function CheckPins()
         local SoundID = GetSoundId()
         PlaySoundFrontend(SoundID, 'Drill_Pin_Break', 'DLC_HEIST_FLEECA_SOUNDSET', true)
         ReleaseSoundId(SoundID)
-        TempF10 = TempF10 + 2.0
+        TempF10 = TempF10 + 1.7
         SetTemp = SetTemp + 0.7
     elseif PinsBroken == 5 then
         Result = true
@@ -65,16 +65,29 @@ local function CheckControls()
     end
 end
 
-function StartDrillingMinigame()
+local function CheckParticles()
+    if SetSpeed < 0.2 or (CurrentDepth - SetDepth) > 0.05 then return end
+    if math.random(0, 20) >= (SetSpeed * 10) then return end
+    if not HasNamedPtfxAssetLoaded('scr_gr_bunk') then
+        RequestNamedPtfxAsset('scr_gr_bunk')
+        while not HasNamedPtfxAssetLoaded('scr_gr_bunk') do Wait(0) end
+    end
+    UseParticleFxAsset('scr_gr_bunk')
+    StartNetworkedParticleFxNonLoopedOnEntity('scr_gr_bunk_drill_spark', DrillObject, 0.0, -0.65, 0.0, 270.0, 0.0, 0.0, math.random(1, 3) + 0.0, false, false, false)
+end
+
+function StartDrillingMinigame(Drill)
     ShouldDrawScaleform, Scaleform, SetSpeed, SetDepth, SetTemp, CurrentDepth, PinsBroken, Result = true, nil, 0.0, 0.0, 0.0, 0.1, 1, false
     TempF9, TempF10, TempF12 = 0.0, 0.0, 0.0
     Scaleform = RequestScaleformMovie('DRILLING')
+    DrillObject = Drill
     while not HasScaleformMovieLoaded(Scaleform) do Wait(0) end
     SetScriptGfxDrawOrder(4)
     while ShouldDrawScaleform do
         CheckControls()
         TemperatureControl()
         CheckPins()
+        CheckParticles()
         CallScaleformMovieMethodWithNumber(Scaleform, 'SET_SPEED', SetSpeed, -1.0, -1.0, -1.0, -1.0)
         CallScaleformMovieMethodWithNumber(Scaleform, 'SET_DRILL_POSITION', SetDepth, -1.0, -1.0, -1.0, -1.0)
         CallScaleformMovieMethodWithNumber(Scaleform, 'SET_TEMPERATURE', SetTemp, -1.0, -1.0, -1.0, -1.0)
