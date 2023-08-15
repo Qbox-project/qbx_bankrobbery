@@ -1,4 +1,4 @@
-QBCore = exports['qb-core']:GetCoreObject()
+QBCore = exports['qbx-core']:GetCoreObject()
 isLoggedIn = LocalPlayer.state['isLoggedIn']
 currentThermiteGate = 0
 CurrentCops = 0
@@ -487,12 +487,12 @@ CreateThread(function()
                 })
                 lockerZone:onPlayerInOut(function(inside)
                     if inside and closestBank ~= 0 and not IsDrilling and Config.SmallBanks[i]["isOpened"] and not Config.SmallBanks[i]["lockers"][k]["isOpened"] and not Config.SmallBanks[i]["lockers"][k]["isBusy"] then
-                        exports['qb-core']:DrawText(Lang:t("general.break_safe_open_option_drawtext"), 'right')
+                        exports['qbx-core']:DrawText(Lang:t("general.break_safe_open_option_drawtext"), 'right')
                         currentLocker = k
                     else
                         if currentLocker == k then
                             currentLocker = 0
-                            exports['qb-core']:HideText()
+                            exports['qbx-core']:HideText()
                         end
                     end
                 end)
@@ -507,9 +507,9 @@ CreateThread(function()
                     if currentLocker ~= 0 and not IsDrilling and Config.SmallBanks[i]["isOpened"] and not Config.SmallBanks[i]["lockers"][currentLocker]["isOpened"] and not Config.SmallBanks[i]["lockers"][currentLocker]["isBusy"] then
                         sleep = 0
                         if IsControlJustPressed(0, 38) then
-                            exports['qb-core']:KeyPressed()
+                            exports['qbx-core']:KeyPressed()
                             Wait(500)
-                            exports['qb-core']:HideText()
+                            exports['qbx-core']:HideText()
                             if CurrentCops >= Config.MinimumFleecaPolice then
                                 openLocker(closestBank, currentLocker)
                             else

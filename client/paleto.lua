@@ -134,12 +134,12 @@ CreateThread(function()
             })
             lockerZone:onPlayerInOut(function(inside)
                 if inside and not IsDrilling and Config.BigBanks["paleto"]["isOpened"] and not Config.BigBanks["paleto"]["lockers"][k]["isBusy"] and not Config.BigBanks["paleto"]["lockers"][k]["isOpened"] then
-                    exports['qb-core']:DrawText(Lang:t("general.break_safe_open_option_drawtext"), 'right')
+                    exports['qbx-core']:DrawText(Lang:t("general.break_safe_open_option_drawtext"), 'right')
                     currentLocker = k
                 else
                     if currentLocker == k then
                         currentLocker = 0
-                        exports['qb-core']:HideText()
+                        exports['qbx-core']:HideText()
                     end
                 end
             end)
@@ -152,9 +152,9 @@ CreateThread(function()
                 if currentLocker ~= 0 and not IsDrilling and Config.BigBanks["paleto"]["isOpened"] and not Config.BigBanks["paleto"]["lockers"][currentLocker]["isBusy"] and not Config.BigBanks["paleto"]["lockers"][currentLocker]["isOpened"] then
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
-                        exports['qb-core']:KeyPressed()
+                        exports['qbx-core']:KeyPressed()
                         Wait(500)
-                        exports['qb-core']:HideText()
+                        exports['qbx-core']:HideText()
                         if CurrentCops >= Config.MinimumPaletoPolice then
                             openLocker("paleto", currentLocker)
                         else
