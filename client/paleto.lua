@@ -21,40 +21,46 @@ RegisterNetEvent('qb-bankrobbery:UseBankcardA', function()
     local pos = GetEntityCoords(ped)
     Config.OnEvidence(pos, 85)
     if not inBankCardAZone then return end
-    QBCore.Functions.TriggerCallback('qb-bankrobbery:server:isRobberyActive', function(isBusy)
-        if not isBusy then
-            if CurrentCops >= Config.MinimumPaletoPolice then
-                if not Config.BigBanks["paleto"]["isOpened"] then
-                    Config.ShowRequiredItems(nil, false)
-                    loadAnimDict("anim@gangops@facility@servers@")
-                    TaskPlayAnim(ped, 'anim@gangops@facility@servers@', 'hotwire', 3.0, 3.0, -1, 1, 0, false, false, false)
-                    QBCore.Functions.Progressbar("security_pass", Lang:t("general.validating_bankcard"), math.random(5000, 10000), false, true, {
-                        disableMovement = true,
-                        disableCarMovement = true,
-                        disableMouse = false,
-                        disableCombat = true,
-                    }, {}, {}, {}, function() -- Done
-                        StopAnimTask(ped, "anim@gangops@facility@servers@", "hotwire", 1.0)
-                        TriggerServerEvent('qb-bankrobbery:server:setBankState', 'paleto')
-                        TriggerServerEvent('qb-bankrobbery:server:removeBankCard', '01')
-                        Config.DoorlockAction(4, false)
-                        if copsCalled or not Config.BigBanks["paleto"]["alarm"] then return end
-                        TriggerServerEvent("qb-bankrobbery:server:callCops", "paleto", 0, pos)
-                        copsCalled = true
-                    end, function() -- Cancel
-                        StopAnimTask(ped, "anim@gangops@facility@servers@", "hotwire", 1.0)
-                        QBCore.Functions.Notify(Lang:t("error.cancel_message"), "error")
-                    end)
+    local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
+    if not isBusy then
+        if CurrentCops >= Config.MinimumPaletoPolice then
+            if not Config.BigBanks["paleto"]["isOpened"] then
+                -- Config.ShowRequiredItems(nil, false)
+                if lib.progressBar({
+                    duration = 7500,
+                    label = Lang:t("general.validating_bankcard"),
+                    canCancel = true,
+                    useWhileDead = false,
+                    disable = {
+                        move = true,
+                        car = true,
+                        mouse = false,
+                        combat = true
+                    },
+                    anim = {
+                        dict = "anim@gangops@facility@servers@",
+                        clip = "hotwire",
+                        flag = 1
+                    }
+                }) then
+                    TriggerServerEvent('qb-bankrobbery:server:setBankState', 'paleto')
+                    TriggerServerEvent('qb-bankrobbery:server:removeBankCard', '01')
+                    Config.DoorlockAction(4, false)
+                    if copsCalled or not Config.BigBanks["paleto"]["alarm"] then return end
+                    TriggerServerEvent("qb-bankrobbery:server:callCops", "paleto", 0, pos)
+                    copsCalled = true
                 else
-                    QBCore.Functions.Notify(Lang:t("error.bank_already_open"), "error")
+                    exports.qbx_core:Notify(Lang:t("error.cancel_message"), "error")
                 end
             else
-                QBCore.Functions.Notify(Lang:t("error.minimum_police_required", {police = Config.MinimumPaletoPolice}), "error")
+                exports.qbx_core:Notify(Lang:t("error.bank_already_open"), "error")
             end
         else
-            QBCore.Functions.Notify(Lang:t("error.security_lock_active"), "error", 5500)
+            exports.qbx_core:Notify(Lang:t("error.minimum_police_required", {police = Config.MinimumPaletoPolice}), "error")
         end
-    end)
+    else
+        exports.qbx_core:Notify(Lang:t("error.security_lock_active"), "error", 5500)
+    end
 end)
 
 -- Threads
@@ -70,13 +76,13 @@ CreateThread(function()
     bankCardAZone:onPlayerInOut(function(inside)
         inBankCardAZone = inside
         if inside and not Config.BigBanks["paleto"]["isOpened"] then
-            Config.ShowRequiredItems({
-                [1] = {name = QBCore.Shared.Items["security_card_01"]["name"], image = QBCore.Shared.Items["security_card_01"]["image"]}
-            }, true)
+            -- Config.ShowRequiredItems({
+            --     [1] = {name = exports.ox_inventory:Items().security_card_01.name, image = exports.ox_inventory:Items().security_card_01.image}
+            -- }, true)
         else
-            Config.ShowRequiredItems({
-                [1] = {name = QBCore.Shared.Items["security_card_01"]["name"], image = QBCore.Shared.Items["security_card_01"]["image"]}
-            }, false)
+            -- Config.ShowRequiredItems({
+            --     [1] = {name = exports.ox_inventory:Items().security_card_01.name, image = exports.ox_inventory:Items().security_card_01.image}
+            -- }, false)
         end
     end)
     local thermite1Zone = BoxZone:Create(Config.BigBanks["paleto"]["thermite"][1]["coords"], 1.0, 1.0, {
@@ -89,15 +95,15 @@ CreateThread(function()
     thermite1Zone:onPlayerInOut(function(inside)
         if inside and not Config.BigBanks["paleto"]["thermite"][1]["isOpened"] then
             currentThermiteGate = Config.BigBanks["paleto"]["thermite"][1]["doorId"]
-            Config.ShowRequiredItems({
-                [1] = {name = QBCore.Shared.Items["thermite"]["name"], image = QBCore.Shared.Items["thermite"]["image"]},
-            }, true)
+            -- Config.ShowRequiredItems({
+            --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
+            -- }, true)
         else
             if currentThermiteGate == Config.BigBanks["paleto"]["thermite"][1]["doorId"] then
                 currentThermiteGate = 0
-                Config.ShowRequiredItems({
-                    [1] = {name = QBCore.Shared.Items["thermite"]["name"], image = QBCore.Shared.Items["thermite"]["image"]},
-                }, false)
+                -- Config.ShowRequiredItems({
+                --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
+                -- }, false)
             end
         end
     end)
@@ -158,7 +164,7 @@ CreateThread(function()
                         if CurrentCops >= Config.MinimumPaletoPolice then
                             openLocker("paleto", currentLocker)
                         else
-                            QBCore.Functions.Notify(Lang:t("error.minimum_police_required", {police = Config.MinimumPaletoPolice}), "error")
+                            exports.qbx_core:Notify(Lang:t("error.minimum_police_required", {police = Config.MinimumPaletoPolice}), "error")
                         end
                         sleep = 1000
                     end
