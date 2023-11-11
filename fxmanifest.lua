@@ -7,10 +7,17 @@ version '1.2.0'
 ui_page 'html/index.html'
 
 shared_scripts {
+    '@ox_lib/init.lua',
+    '@qbx_core/import.lua',
     'sh_config.lua', -- Shared config
     '@qb-core/shared/locale.lua',
     'locales/en.lua',
     'locales/*.lua'
+}
+
+modules {
+    'qbx_core:playerdata',
+    'qbx_core:utils'
 }
 
 client_scripts {

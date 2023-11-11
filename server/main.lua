@@ -1,4 +1,4 @@
-local QBCore = exports['qbx-core']:GetCoreObject()
+-- local QBCore = exports['qbx-core']:GetCoreObject()
 local robberyBusy = false
 local timeOut = false
 
@@ -163,7 +163,7 @@ end)
 
 RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, lockerId)
     local src = source
-    local ply = QBCore.Functions.GetPlayer(src)
+    local ply = exports.qbx_core:GetPlayer(src)
     if not ply then return end
     if type == "small" then
         if #(GetEntityCoords(GetPlayerPed(src)) - Config.SmallBanks[bankId]["lockers"][lockerId]["coords"]) > 2.5 then
@@ -177,25 +177,25 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
         if tierChance < 50 then tier = 1 elseif tierChance >= 50 and tierChance < 80 then tier = 2 elseif tierChance >= 80 and tierChance < 95 then tier = 3 else tier = 4 end
         if WeaponChance ~= odd1 then
             if tier ~= 4 then
-                 if Config.RewardTypes[itemType].type == "item" then
+                if Config.RewardTypes[itemType].type == "item" then
                     local item = Config.LockerRewards["tier"..tier][math.random(#Config.LockerRewards["tier"..tier])]
                     local itemAmount = math.random(item.minAmount, item.maxAmount)
                     ply.Functions.AddItem(item.item, itemAmount)
-                    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item.item], "add")
-                 elseif Config.RewardTypes[itemType].type == "money" then
+                    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()[item.item], "add")
+                elseif Config.RewardTypes[itemType].type == "money" then
                     local info = {
                         worth = math.random(2300, 3200)
                     }
                     ply.Functions.AddItem('markedbills', math.random(2,3), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['markedbills'], "add")
+                    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['markedbills'], "add")
                 end
             else
                 ply.Functions.AddItem('security_card_01', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['security_card_01'], "add")
+                TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['security_card_01'], "add")
             end
         else
             ply.Functions.AddItem('weapon_stungun', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['weapon_stungun'], "add")
+            TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['weapon_stungun'], "add")
         end
     elseif type == "paleto" then
         if #(GetEntityCoords(GetPlayerPed(source)) - Config.BigBanks["paleto"]["lockers"][lockerId]["coords"]) > 2.5 then
@@ -213,21 +213,21 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                     local item = Config.LockerRewardsPaleto["tier"..tier][math.random(#Config.LockerRewardsPaleto["tier"..tier])]
                     local itemAmount = math.random(item.minAmount, item.maxAmount)
                     ply.Functions.AddItem(item.item, itemAmount)
-                    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item.item], "add")
+                    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()[item.item], "add")
                  elseif Config.RewardTypes[itemType].type == "money" then
                     local info = {
                         worth = math.random(4000, 6000)
                     }
                     ply.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['markedbills'], "add")
+                    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['markedbills'], "add")
                  end
             else
                 ply.Functions.AddItem('security_card_02', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['security_card_02'], "add")
+                TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['security_card_02'], "add")
             end
         else
             ply.Functions.AddItem('weapon_vintagepistol', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['weapon_vintagepistol'], "add")
+            TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['weapon_vintagepistol'], "add")
         end
     elseif type == "pacific" then
         if #(GetEntityCoords(GetPlayerPed(source)) - Config.BigBanks["pacific"]["lockers"][lockerId]["coords"]) > 2.5 then
@@ -248,35 +248,35 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                     if tier == 3 then maxAmount = 7 elseif tier == 2 then maxAmount = 18 else maxAmount = 25 end
                     local itemAmount = math.random(maxAmount)
                     ply.Functions.AddItem(item.item, itemAmount)
-                    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item.item], "add")
+                    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()[item.item], "add")
                 elseif Config.RewardTypes[itemType].type == "money" then
                     local info = {
                         worth = math.random(19000, 21000)
                     }
                     ply.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['markedbills'], "add")
+                    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['markedbills'], "add")
                 end
             else
                 local info = {
                     worth = math.random(19000, 21000)
                 }
                 ply.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['markedbills'], "add")
+                TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['markedbills'], "add")
                 info = {
                     crypto = math.random(1, 3)
                 }
                 ply.Functions.AddItem("cryptostick", 1, false, info)
-                TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['cryptostick'], "add")
+                TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['cryptostick'], "add")
             end
         else
             local chance = math.random(1, 2)
             local odd = math.random(1, 2)
             if chance == odd then
                 ply.Functions.AddItem('weapon_microsmg', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['weapon_microsmg'], "add")
+                TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['weapon_microsmg'], "add")
             else
                 ply.Functions.AddItem('weapon_minismg', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['weapon_minismg'], "add")
+                TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['weapon_minismg'], "add")
             end
         end
     end
@@ -361,20 +361,20 @@ end)
 
 RegisterNetEvent('qb-bankrobbery:server:removeElectronicKit', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = exports.qbx_core:GetPlayer(src)
     if not Player then return end
     Player.Functions.RemoveItem('electronickit', 1)
-    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["electronickit"], "remove")
+    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()["electronickit"], "remove")
     Player.Functions.RemoveItem('trojan_usb', 1)
-    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["trojan_usb"], "remove")
+    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()["trojan_usb"], "remove")
 end)
 
 RegisterNetEvent('qb-bankrobbery:server:removeBankCard', function(number)
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = exports.qbx_core:GetPlayer(src)
     if not Player then return end
     Player.Functions.RemoveItem('security_card_'..number, 1)
-    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['security_card_'..number], "remove")
+    TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()['security_card_'..number], "remove")
 end)
 
 RegisterNetEvent('thermite:StartServerFire', function(coords, maxChildren, isGasFire)
@@ -394,30 +394,29 @@ RegisterNetEvent('thermite:StopFires', function()
 end)
 
 -- Callbacks
-
-QBCore.Functions.CreateCallback('qb-bankrobbery:server:isRobberyActive', function(_, cb)
-    cb(robberyBusy)
+lib.callback.register('qb-bankrobbery:server:isRobberyActive', function()
+    return robberyBusy
 end)
 
-QBCore.Functions.CreateCallback('qb-bankrobbery:server:GetConfig', function(_, cb)
-    cb(Config.PowerStations, Config.BigBanks, Config.SmallBanks)
+lib.callback.register('qb-bankrobbery:server:GetConfig', function()
+    return Config.PowerStations, Config.BigBanks, Config.SmallBanks
 end)
 
-QBCore.Functions.CreateCallback("thermite:server:check", function(source, cb)
-    local Player = QBCore.Functions.GetPlayer(source)
-    if not Player then return cb(false) end
+lib.callback.register('thermite:server:check', function(source)
+    local Player = exports.qbx_core:GetPlayer(source)
+    if not Player then return false end
     if Player.Functions.RemoveItem("thermite", 1) then
-        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items["thermite"], "remove")
-        cb(true)
+        TriggerClientEvent('inventory:client:ItemBox', source, exports.ox_inventory:Items()["thermite"], "remove")
+        return true
     else
-        cb(false)
+        return false
     end
 end)
 
 -- Items
 
-QBCore.Functions.CreateUseableItem("thermite", function(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+exports.qbx_core:CreateUseableItem("thermite", function(source)
+    local Player = exports.qbx_core:GetPlayer(source)
     if not Player or not Player.Functions.GetItemByName('thermite') then return end
 	if Player.Functions.GetItemByName('lighter') then
         TriggerClientEvent("thermite:UseThermite", source)
@@ -426,20 +425,20 @@ QBCore.Functions.CreateUseableItem("thermite", function(source)
     end
 end)
 
-QBCore.Functions.CreateUseableItem("security_card_01", function(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+exports.qbx_core:CreateUseableItem("security_card_01", function(source)
+    local Player = exports.qbx_core:GetPlayer(source)
 	if not Player or not Player.Functions.GetItemByName('security_card_01') then return end
     TriggerClientEvent("qb-bankrobbery:UseBankcardA", source)
 end)
 
-QBCore.Functions.CreateUseableItem("security_card_02", function(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+exports.qbx_core:CreateUseableItem("security_card_02", function(source)
+    local Player = exports.qbx_core:GetPlayer(source)
 	if not Player or not Player.Functions.GetItemByName('security_card_02') then return end
     TriggerClientEvent("qb-bankrobbery:UseBankcardB", source)
 end)
 
-QBCore.Functions.CreateUseableItem("electronickit", function(source)
-    local Player = QBCore.Functions.GetPlayer(source)
+exports.qbx_core:CreateUseableItem("electronickit", function(source)
+    local Player = exports.qbx_core:GetPlayer(source)
     if not Player or not Player.Functions.GetItemByName('electronickit') then return end
     TriggerClientEvent("electronickit:UseElectronickit", source)
 end)

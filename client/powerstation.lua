@@ -2,7 +2,7 @@ local closestStation = 0
 local currentStation = 0
 local currentFires = {}
 local currentGate = 0
-local requiredItems = {[1] = {name = QBCore.Shared.Items["thermite"]["name"], image = QBCore.Shared.Items["thermite"]["image"]}}
+local requiredItems = {[1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image}}
 
 -- Functions
 
@@ -60,7 +60,7 @@ RegisterNetEvent('thermite:UseThermite', function()
                 if not Config.PowerStations[closestStation].hit then
                     loadAnimDict("weapon@w_sp_jerrycan")
                     TaskPlayAnim(PlayerPedId(), "weapon@w_sp_jerrycan", "fire", 3.0, 3.9, 180, 49, 0, 0, 0, 0)
-                    Config.ShowRequiredItems(requiredItems, false)
+                    -- Config.ShowRequiredItems(requiredItems, false)
                     SetNuiFocus(true, true)
                     SendNUIMessage({
                         action = "openThermite",
@@ -68,10 +68,10 @@ RegisterNetEvent('thermite:UseThermite', function()
                     })
                     currentStation = closestStation
                 else
-                    QBCore.Functions.Notify(Lang:t("error.fuses_already_blown"), "error")
+                    exports.qbx_core:Notify(Lang:t("error.fuses_already_blown"), "error")
                 end
             else
-                QBCore.Functions.Notify(Lang:t("error.minium_police_required", {police = Config.MinimumThermitePolice}), "error")
+                exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = Config.MinimumThermitePolice}), "error")
             end
         end
     elseif currentThermiteGate ~= 0 then
@@ -80,14 +80,14 @@ RegisterNetEvent('thermite:UseThermite', function()
             currentGate = currentThermiteGate
             loadAnimDict("weapon@w_sp_jerrycan")
             TaskPlayAnim(PlayerPedId(), "weapon@w_sp_jerrycan", "fire", 3.0, 3.9, -1, 49, 0, 0, 0, 0)
-            Config.ShowRequiredItems(requiredItems, false)
+            -- Config.ShowRequiredItems(requiredItems, false)
             SetNuiFocus(true, true)
             SendNUIMessage({
                 action = "openThermite",
                 amount = math.random(5, 10),
             })
         else
-            QBCore.Functions.Notify(Lang:t("error.minium_police_required", {police = Config.MinimumThermitePolice}), "error")
+            exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = Config.MinimumThermitePolice}), "error")
         end
     end
 end)
@@ -104,42 +104,40 @@ RegisterNUICallback('thermiteclick', function(_, cb)
 end)
 
 RegisterNUICallback('thermitefailed', function(_, cb)
-    QBCore.Functions.TriggerCallback("thermite:server:check", function(success)
-        if success then
-            PlaySound(-1, "Place_Prop_Fail", "DLC_Dmod_Prop_Editor_Sounds", 0, 0, 1)
-            ClearPedTasks(PlayerPedId())
-            local coords = GetEntityCoords(PlayerPedId())
-            local randTime = math.random(10000, 15000)
-            CreateFire(coords, randTime)
-        end
-        cb('ok')
-    end)
+    local success = lib.callback.await('thermite:server:check', false)
+    if success then
+        PlaySound(-1, "Place_Prop_Fail", "DLC_Dmod_Prop_Editor_Sounds", 0, 0, 1)
+        ClearPedTasks(PlayerPedId())
+        local coords = GetEntityCoords(PlayerPedId())
+        local randTime = math.random(10000, 15000)
+        CreateFire(coords, randTime)
+    end
+    cb('ok')
 end)
 
 RegisterNUICallback('thermitesuccess', function(_, cb)
-    QBCore.Functions.TriggerCallback("thermite:server:check", function(success)
-        if success then
-            ClearPedTasks(PlayerPedId())
-            local time = 3
-            local coords = GetEntityCoords(PlayerPedId())
-            while time > 0 do
-                QBCore.Functions.Notify(Lang:t("general.thermite_detonating_in_seconds", {time = time}))
-                Wait(1000)
-                time -= 1
-            end
-            local randTime = math.random(10000, 15000)
-            CreateFire(coords, randTime)
-            if currentStation ~= 0 then
-                QBCore.Functions.Notify(Lang:t("success.fuses_are_blown"), "success")
-                TriggerServerEvent("qb-bankrobbery:server:SetStationStatus", currentStation, true)
-            elseif currentGate ~= 0 then
-                QBCore.Functions.Notify(Lang:t("success.door_has_opened"), "success")
-                Config.DoorlockAction(currentGate, false)
-                currentGate = 0
-            end
+    local success = lib.callback.await('thermite:server:check', false)
+    if success then
+        ClearPedTasks(PlayerPedId())
+        local time = 3
+        local coords = GetEntityCoords(PlayerPedId())
+        while time > 0 do
+            exports.qbx_core:Notify(Lang:t("general.thermite_detonating_in_seconds", {time = time}))
+            Wait(1000)
+            time -= 1
         end
-        cb('ok')
-    end)
+        local randTime = math.random(10000, 15000)
+        CreateFire(coords, randTime)
+        if currentStation ~= 0 then
+            exports.qbx_core:Notify(Lang:t("success.fuses_are_blown"), "success")
+            TriggerServerEvent("qb-bankrobbery:server:SetStationStatus", currentStation, true)
+        elseif currentGate ~= 0 then
+            exports.qbx_core:Notify(Lang:t("success.door_has_opened"), "success")
+            Config.DoorlockAction(currentGate, false)
+            currentGate = 0
+        end
+    end
+    cb('ok')
 end)
 
 RegisterNUICallback('closethermite', function(_, cb)
@@ -161,11 +159,11 @@ CreateThread(function()
         stationZone:onPlayerInOut(function(inside)
             if inside and not Config.PowerStations[k].hit then
                 closestStation = k
-                Config.ShowRequiredItems(requiredItems, true)
+                -- Config.ShowRequiredItems(requiredItems, true)
             else
                 if closestStation == k then
                     closestStation = 0
-                    Config.ShowRequiredItems(requiredItems, false)
+                    -- Config.ShowRequiredItems(requiredItems, false)
                 end
             end
         end)

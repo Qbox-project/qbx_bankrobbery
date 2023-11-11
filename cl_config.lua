@@ -30,7 +30,7 @@ end
 --- @param chance number
 --- @return nil
 function Config.OnEvidence(pos, chance)
-    if math.random(1, 100) > chance or QBCore.Functions.IsWearingGloves() then return end
+    if math.random(1, 100) > chance or IsWearingGloves() then return end
     TriggerServerEvent("evidence:server:CreateFingerDrop", pos)
 end
 
@@ -58,9 +58,9 @@ end
 --- @param items table | nil
 --- @param show boolean
 --- @return nil
-function Config.ShowRequiredItems(items, show)
-    TriggerEvent('inventory:client:requiredItems', items, show)
-end
+-- function Config.ShowRequiredItems(items, show)
+--     TriggerEvent('inventory:client:requiredItems', items, show)
+-- end
 
 Config.MinimumPaletoPolice = 0
 Config.MinimumPacificPolice = 0
