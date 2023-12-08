@@ -1,29 +1,24 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'Bankrobbery for QB-Core'
-version '1.2.0'
+description 'qbx_bankrobbery'
+repository 'https://github.com/Qbox-project/qbx_bankrobbery'
+version '1.0.0'
 
 ui_page 'html/index.html'
 
 shared_scripts {
     '@ox_lib/init.lua',
-    '@qbx_core/import.lua',
-    'sh_config.lua', -- Shared config
+    '@qbx_core/modules/utils.lua',
     '@qb-core/shared/locale.lua',
     'locales/en.lua',
     'locales/*.lua'
 }
 
-modules {
-    'qbx_core:playerdata',
-    'qbx_core:utils'
-}
-
 client_scripts {
+    '@qbx_core/modules/playerdata.lua',
     '@PolyZone/client.lua',
     '@PolyZone/BoxZone.lua',
-    'cl_config.lua', -- Client config
     'client/fleeca.lua',
     'client/pacific.lua',
     'client/powerstation.lua',
@@ -32,15 +27,16 @@ client_scripts {
 }
 
 server_scripts {
-    'sv_config.lua', -- Server config
     'server/main.lua'
 }
 
 files {
+    'config/client.lua',
+    'config/shared.lua',
     'html/*',
 }
 
 dependency 'PolyZone'
 
 lua54 'yes'
-use_fxv2_oal 'yes'
+use_experimental_fxv2_oal 'yes'
