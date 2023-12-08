@@ -94,16 +94,6 @@ local function OnHackDone(success)
     TriggerServerEvent('qb-bankrobbery:server:setBankState', closestBank)
 end
 
---- This will load an animation dictionary so you can play an animation in that dictionary
---- @param dict string
---- @return nil
-local function loadAnimDict(dict)
-    RequestAnimDict(dict)
-    while not HasAnimDictLoaded(dict) do
-        Wait(0)
-    end
-end
-
 --- This will open the bank door of any small bank
 --- @param bankId number
 --- @return nil
@@ -307,7 +297,7 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
                         if copsCalled or not sharedConfig.smallBanks[closestBank]["alarm"] then return end
                         TriggerServerEvent("qb-bankrobbery:server:callCops", "small", closestBank, pos)
                         copsCalled = true
-                        SetTimeout(60000 * Config.OutlawCooldown, function() copsCalled = false end)
+                        SetTimeout(60000 * config.outlawCooldown, function() copsCalled = false end)
                     else
                         exports.qbx_core:Notify(Lang:t("error.cancel_message"), "error")
                     end
