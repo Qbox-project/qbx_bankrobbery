@@ -1,8 +1,9 @@
+local config = require 'config.client'
+local sharedConfig = require 'config.shared'
 local closestStation = 0
 local currentStation = 0
 local currentFires = {}
 local currentGate = 0
-local requiredItems = {[1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image}}
 
 -- Functions
 
@@ -53,11 +54,12 @@ RegisterNetEvent('thermite:UseThermite', function()
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
     if closestStation ~= 0 then
-        Config.OnEvidence(pos, 85)
-        local dist = #(pos - Config.PowerStations[closestStation].coords)
+        if math.random(1, 100) > 85 or IsWearingGloves() then return end
+        TriggerServerEvent("evidence:server:CreateFingerDrop", pos)
+        local dist = #(pos - sharedConfig.powerStations[closestStation].coords)
         if dist < 1.5 then
-            if CurrentCops >= Config.MinimumThermitePolice then
-                if not Config.PowerStations[closestStation].hit then
+            if CurrentCops >= config.minThermitePolice then
+                if not sharedConfig.powerStations[closestStation].hit then
                     loadAnimDict("weapon@w_sp_jerrycan")
                     TaskPlayAnim(PlayerPedId(), "weapon@w_sp_jerrycan", "fire", 3.0, 3.9, 180, 49, 0, 0, 0, 0)
                     -- Config.ShowRequiredItems(requiredItems, false)
@@ -71,12 +73,13 @@ RegisterNetEvent('thermite:UseThermite', function()
                     exports.qbx_core:Notify(Lang:t("error.fuses_already_blown"), "error")
                 end
             else
-                exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = Config.MinimumThermitePolice}), "error")
+                exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = config.minThermitePolice}), "error")
             end
         end
     elseif currentThermiteGate ~= 0 then
-        Config.OnEvidence(pos, 85)
-        if CurrentCops >= Config.MinimumThermitePolice then
+        if math.random(1, 100) > 85 or IsWearingGloves() then return end
+        TriggerServerEvent("evidence:server:CreateFingerDrop", pos)
+        if CurrentCops >= config.minThermitePolice then
             currentGate = currentThermiteGate
             loadAnimDict("weapon@w_sp_jerrycan")
             TaskPlayAnim(PlayerPedId(), "weapon@w_sp_jerrycan", "fire", 3.0, 3.9, -1, 49, 0, 0, 0, 0)
@@ -87,13 +90,13 @@ RegisterNetEvent('thermite:UseThermite', function()
                 amount = math.random(5, 10),
             })
         else
-            exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = Config.MinimumThermitePolice}), "error")
+            exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = config.minThermitePolice}), "error")
         end
     end
 end)
 
 RegisterNetEvent('qb-bankrobbery:client:SetStationStatus', function(key, isHit)
-    Config.PowerStations[key].hit = isHit
+    sharedConfig.powerStations[key].hit = isHit
 end)
 
 -- NUI Callbacks
@@ -133,7 +136,7 @@ RegisterNUICallback('thermitesuccess', function(_, cb)
             TriggerServerEvent("qb-bankrobbery:server:SetStationStatus", currentStation, true)
         elseif currentGate ~= 0 then
             exports.qbx_core:Notify(Lang:t("success.door_has_opened"), "success")
-            Config.DoorlockAction(currentGate, false)
+            --Config.DoorlockAction(currentGate, false)
             currentGate = 0
         end
     end
@@ -148,16 +151,16 @@ end)
 -- Threads
 
 CreateThread(function()
-    for k = 1, #Config.PowerStations do
-        local stationZone = BoxZone:Create(Config.PowerStations[k].coords, 1.0, 1.0, {
+    for k = 1, #sharedConfig.powerStations do
+        local stationZone = BoxZone:Create(sharedConfig.powerStations[k].coords, 1.0, 1.0, {
             name = 'powerstation_coords_'..k,
             heading = 90.0,
-            minZ = Config.PowerStations[k].coords.z - 1,
-            maxZ = Config.PowerStations[k].coords.z + 1,
+            minZ = sharedConfig.powerStations[k].coords.z - 1,
+            maxZ = sharedConfig.powerStations[k].coords.z + 1,
             debugPoly = false
         })
         stationZone:onPlayerInOut(function(inside)
-            if inside and not Config.PowerStations[k].hit then
+            if inside and not sharedConfig.powerStations[k].hit then
                 closestStation = k
                 -- Config.ShowRequiredItems(requiredItems, true)
             else
