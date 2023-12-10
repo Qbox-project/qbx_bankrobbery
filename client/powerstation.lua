@@ -1,38 +1,24 @@
 local config = require 'config.client'
-local sharedConfig = require 'config.shared'
+local powerStationConfig = require 'config.shared'.powerStations
 local closestStation = 0
 local currentStation = 0
 local currentFires = {}
 local currentGate = 0
 
--- Functions
-
 --- This will create a fire at the given coords and for the given time
 --- @param coords vector3
 --- @param time number
 --- @return nil
-local function CreateFire(coords, time)
+local function createFire(coords, time)
     for _ = 1, math.random(1, 7), 1 do
-        TriggerServerEvent("thermite:StartServerFire", coords, 24, false)
+        TriggerServerEvent('thermite:StartServerFire', coords, 24, false)
     end
     Wait(time)
-    TriggerServerEvent("thermite:StopFires")
+    TriggerServerEvent('thermite:StopFires')
 end
-
---- This will load an animation dictionary so you can play an animation in that dictionary
---- @param dict string
---- @return nil
-local function loadAnimDict(dict)
-    RequestAnimDict(dict)
-    while not HasAnimDictLoaded(dict) do
-        Wait(0)
-    end
-end
-
--- Events
 
 RegisterNetEvent('thermite:StartFire', function(coords, maxChildren, isGasFire)
-    if #(vector3(coords.x, coords.y, coords.z) - GetEntityCoords(PlayerPedId())) < 100 then
+    if #(vec3(coords.x, coords.y, coords.z) - GetEntityCoords(cache.ped)) < 100 then
         local pos = {
             x = coords.x,
             y = coords.y,
@@ -51,69 +37,66 @@ RegisterNetEvent('thermite:StopFires', function()
 end)
 
 RegisterNetEvent('thermite:UseThermite', function()
-    local ped = PlayerPedId()
-    local pos = GetEntityCoords(ped)
+    local pos = GetEntityCoords(cache.ped)
     if closestStation ~= 0 then
         if math.random(1, 100) > 85 or IsWearingGloves() then return end
-        TriggerServerEvent("evidence:server:CreateFingerDrop", pos)
-        local dist = #(pos - sharedConfig.powerStations[closestStation].coords)
+        TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
+        local dist = #(pos - powerStationConfig[closestStation].coords)
         if dist < 1.5 then
             if CurrentCops >= config.minThermitePolice then
-                if not sharedConfig.powerStations[closestStation].hit then
-                    loadAnimDict("weapon@w_sp_jerrycan")
-                    TaskPlayAnim(PlayerPedId(), "weapon@w_sp_jerrycan", "fire", 3.0, 3.9, 180, 49, 0, 0, 0, 0)
+                if not powerStationConfig[closestStation].hit then
+                    lib.requestAnimDict('weapon@w_sp_jerrycan')
+                    TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, 180, 49, 0, false, false, false)
                     -- Config.ShowRequiredItems(requiredItems, false)
                     SetNuiFocus(true, true)
                     SendNUIMessage({
-                        action = "openThermite",
+                        action = 'openThermite',
                         amount = math.random(5, 10),
                     })
                     currentStation = closestStation
                 else
-                    exports.qbx_core:Notify(Lang:t("error.fuses_already_blown"), "error")
+                    exports.qbx_core:Notify(Lang:t('error.fuses_already_blown'), 'error')
                 end
             else
-                exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = config.minThermitePolice}), "error")
+                exports.qbx_core:Notify(Lang:t('error.minium_police_required', {police = config.minThermitePolice}), 'error')
             end
         end
     elseif currentThermiteGate ~= 0 then
         if math.random(1, 100) > 85 or IsWearingGloves() then return end
-        TriggerServerEvent("evidence:server:CreateFingerDrop", pos)
+        TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         if CurrentCops >= config.minThermitePolice then
             currentGate = currentThermiteGate
-            loadAnimDict("weapon@w_sp_jerrycan")
-            TaskPlayAnim(PlayerPedId(), "weapon@w_sp_jerrycan", "fire", 3.0, 3.9, -1, 49, 0, 0, 0, 0)
+            lib.requestAnimDict('weapon@w_sp_jerrycan')
+            TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, -1, 49, 0, false, false, false)
             -- Config.ShowRequiredItems(requiredItems, false)
             SetNuiFocus(true, true)
             SendNUIMessage({
-                action = "openThermite",
+                action = 'openThermite',
                 amount = math.random(5, 10),
             })
         else
-            exports.qbx_core:Notify(Lang:t("error.minium_police_required", {police = config.minThermitePolice}), "error")
+            exports.qbx_core:Notify(Lang:t('error.minium_police_required', {police = config.minThermitePolice}), 'error')
         end
     end
 end)
 
 RegisterNetEvent('qb-bankrobbery:client:SetStationStatus', function(key, isHit)
-    sharedConfig.powerStations[key].hit = isHit
+    powerStationConfig[key].hit = isHit
 end)
 
--- NUI Callbacks
-
 RegisterNUICallback('thermiteclick', function(_, cb)
-    PlaySound(-1, "CLICK_BACK", "WEB_NAVIGATION_SOUNDS_PHONE", 0, 0, 1)
+    PlaySound(-1, 'CLICK_BACK', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
     cb('ok')
 end)
 
 RegisterNUICallback('thermitefailed', function(_, cb)
     local success = lib.callback.await('thermite:server:check', false)
     if success then
-        PlaySound(-1, "Place_Prop_Fail", "DLC_Dmod_Prop_Editor_Sounds", 0, 0, 1)
-        ClearPedTasks(PlayerPedId())
-        local coords = GetEntityCoords(PlayerPedId())
+        PlaySound(-1, 'Place_Prop_Fail', 'DLC_Dmod_Prop_Editor_Sounds', false, 0, true)
+        ClearPedTasks(cache.ped)
+        local coords = GetEntityCoords(cache.ped)
         local randTime = math.random(10000, 15000)
-        CreateFire(coords, randTime)
+        createFire(coords, randTime)
     end
     cb('ok')
 end)
@@ -121,21 +104,21 @@ end)
 RegisterNUICallback('thermitesuccess', function(_, cb)
     local success = lib.callback.await('thermite:server:check', false)
     if success then
-        ClearPedTasks(PlayerPedId())
+        ClearPedTasks(cache.ped)
         local time = 3
-        local coords = GetEntityCoords(PlayerPedId())
+        local coords = GetEntityCoords(cache.ped)
         while time > 0 do
-            exports.qbx_core:Notify(Lang:t("general.thermite_detonating_in_seconds", {time = time}))
+            exports.qbx_core:Notify(Lang:t('general.thermite_detonating_in_seconds', {time = time}))
             Wait(1000)
             time -= 1
         end
         local randTime = math.random(10000, 15000)
-        CreateFire(coords, randTime)
+        createFire(coords, randTime)
         if currentStation ~= 0 then
-            exports.qbx_core:Notify(Lang:t("success.fuses_are_blown"), "success")
-            TriggerServerEvent("qb-bankrobbery:server:SetStationStatus", currentStation, true)
+            exports.qbx_core:Notify(Lang:t('success.fuses_are_blown'), 'success')
+            TriggerServerEvent('qb-bankrobbery:server:SetStationStatus', currentStation, true)
         elseif currentGate ~= 0 then
-            exports.qbx_core:Notify(Lang:t("success.door_has_opened"), "success")
+            exports.qbx_core:Notify(Lang:t('success.door_has_opened'), 'success')
             --Config.DoorlockAction(currentGate, false)
             currentGate = 0
         end
@@ -148,19 +131,17 @@ RegisterNUICallback('closethermite', function(_, cb)
     cb('ok')
 end)
 
--- Threads
-
 CreateThread(function()
-    for k = 1, #sharedConfig.powerStations do
-        local stationZone = BoxZone:Create(sharedConfig.powerStations[k].coords, 1.0, 1.0, {
+    for k = 1, #powerStationConfig do
+        local stationZone = BoxZone:Create(powerStationConfig[k].coords, 1.0, 1.0, {
             name = 'powerstation_coords_'..k,
             heading = 90.0,
-            minZ = sharedConfig.powerStations[k].coords.z - 1,
-            maxZ = sharedConfig.powerStations[k].coords.z + 1,
+            minZ = powerStationConfig[k].coords.z - 1,
+            maxZ = powerStationConfig[k].coords.z + 1,
             debugPoly = false
         })
         stationZone:onPlayerInOut(function(inside)
-            if inside and not sharedConfig.powerStations[k].hit then
+            if inside and not powerStationConfig[k].hit then
                 closestStation = k
                 -- Config.ShowRequiredItems(requiredItems, true)
             else
