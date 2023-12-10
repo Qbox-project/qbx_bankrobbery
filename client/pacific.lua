@@ -218,7 +218,7 @@ CreateThread(function()
                             openLocker('pacific', k)
                         end,
                         canInteract = function()
-                            return not IsDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened
+                            return not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened
                         end,
                         icon = 'fa-solid fa-vault',
                         label = Lang:t('general.break_safe_open_option_target'),
@@ -235,7 +235,7 @@ CreateThread(function()
                 debugPoly = false
             })
             lockerZone:onPlayerInOut(function(inside)
-                if inside and not IsDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened then
+                if inside and not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened then
                     exports['qbx-core']:DrawText(Lang:t('general.break_safe_open_option_drawtext'), 'right')
                     currentLocker = k
                 else
@@ -251,7 +251,7 @@ CreateThread(function()
         while true do
             local sleep = 1000
             if isLoggedIn then
-                if currentLocker ~= 0 and not IsDrilling and pacificConfig.isOpened and not pacificConfig.lockers[currentLocker].isBusy and not pacificConfig.lockers[currentLocker].isOpened then
+                if currentLocker ~= 0 and not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[currentLocker].isBusy and not pacificConfig.lockers[currentLocker].isOpened then
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
                         exports['qbx-core']:KeyPressed()

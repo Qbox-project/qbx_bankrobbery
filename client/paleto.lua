@@ -110,7 +110,7 @@ CreateThread(function()
                             openLocker('paleto', k)
                         end,
                         canInteract = function()
-                            return not IsDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened
+                            return not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened
                         end,
                         icon = 'fa-solid fa-vault',
                         label = Lang:t('general.break_safe_open_option_target'),
@@ -127,7 +127,7 @@ CreateThread(function()
                 debugPoly = false
             })
             lockerZone:onPlayerInOut(function(inside)
-                if inside and not IsDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened then
+                if inside and not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened then
                     exports['qbx-core']:DrawText(Lang:t('general.break_safe_open_option_drawtext'), 'right')
                     currentLocker = k
                 else
@@ -143,7 +143,7 @@ CreateThread(function()
         while true do
             local sleep = 1000
             if isLoggedIn then
-                if currentLocker ~= 0 and not IsDrilling and paletoConfig.isOpened and not paletoConfig.lockers[currentLocker].isBusy and not paletoConfig.lockers[currentLocker].isOpened then
+                if currentLocker ~= 0 and not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[currentLocker].isBusy and not paletoConfig.lockers[currentLocker].isOpened then
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
                         exports['qbx-core']:KeyPressed()
