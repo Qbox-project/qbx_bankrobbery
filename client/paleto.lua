@@ -54,7 +54,7 @@ end)
 -- Threads
 
 CreateThread(function()
-    local bankCardAZone = lib.zones.box({
+    lib.zones.box({
         name = 'paleto_coords_bankcarda',
         coords = paletoConfig.coords,
         size = vec3(1, 1, 2),
@@ -73,7 +73,7 @@ CreateThread(function()
             -- }, false)
         end,
     })
-    local thermite1Zone = lib.zones.box({
+    lib.zones.box({
         name = 'paleto_coords_thermite_1',
         coords = paletoConfig.thermite[1].coords,
         size = vec3(1, 1, 2),
@@ -120,7 +120,7 @@ CreateThread(function()
                 },
             })
         else
-            local lockerZone = lib.zones.box({
+            lib.zones.box({
                 name = 'paleto_coords_locker_'..k,
                 coords = paletoConfig.lockers[k].coords,
                 size = vec3(1, 1, 2),

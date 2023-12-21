@@ -451,7 +451,7 @@ end)
 
 CreateThread(function()
     for i = 1, #sharedConfig.smallBanks do
-        local bankZone = lib.zones.box({
+        lib.zones.box({
             name = 'fleeca_'..i..'_coords_electronickit',
             coords = sharedConfig.smallBanks[i].coords,
             size = vec3(1, 1, 2),
@@ -482,7 +482,7 @@ CreateThread(function()
                     },
                 })
             else
-                local lockerZone = lib.zones.box({
+                lib.zones.box({
                     name = 'fleeca_'..i..'_coords_locker_'..k,
                     coords = sharedConfig.smallBanks[i].lockers[k].coords,
                     size = vec3(1, 1, 2),

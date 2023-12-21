@@ -133,7 +133,7 @@ end)
 
 CreateThread(function()
     for k = 1, #powerStationConfig do
-        local stationZone = lib.zones.box({
+        lib.zones.box({
             name = 'powerstation_coords_'..k,
             coords = powerStationConfig[k].coords,
             size = vec3(1, 1, 2),

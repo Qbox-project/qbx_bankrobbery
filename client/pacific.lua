@@ -119,7 +119,7 @@ end)
 -- Threads
 
 CreateThread(function()
-    local bankCardBZone = lib.zones.box({
+    lib.zones.box({
         name = 'pacific_coords_bankcardb',
         coords = pacificConfig.coords[1],
         size = vec3(1, 1, 2),
@@ -138,7 +138,7 @@ CreateThread(function()
             -- }, false)
         end,
     })
-    local electronickitZone = lib.zones.box({
+    lib.zones.box({
         name = 'pacific_coords_electronickit',
         coords = pacificConfig.coords[2],
         size = vec3(1, 1, 2),
@@ -159,7 +159,7 @@ CreateThread(function()
             -- }, false)
         end,
     })
-    local thermite1Zone = lib.zones.box({
+    lib.zones.box({
         name = 'pacific_coords_thermite_1',
         coords = pacificConfig.thermite[1].coords,
         size = vec3(1, 1, 2),
@@ -182,7 +182,7 @@ CreateThread(function()
             end
         end,
     })
-    local thermite2Zone = lib.zones.box({
+    lib.zones.box({
         name = 'pacific_coords_thermite_2',
         coords = pacificConfig.thermite[2].coords,
         size = vec3(1, 1, 2),
@@ -229,7 +229,7 @@ CreateThread(function()
                 },
             })
         else
-            local lockerZone = lib.zones.box({
+            lib.zones.box({
                 name = 'pacific_coords_locker_'..k,
                 coords = pacificConfig.lockers[k].coords,
                 size = vec3(1, 1, 2),
