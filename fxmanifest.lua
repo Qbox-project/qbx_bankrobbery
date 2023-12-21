@@ -17,8 +17,6 @@ shared_scripts {
 
 client_scripts {
     '@qbx_core/modules/playerdata.lua',
-    '@PolyZone/client.lua',
-    '@PolyZone/BoxZone.lua',
     'client/fleeca.lua',
     'client/pacific.lua',
     'client/powerstation.lua',
@@ -35,8 +33,6 @@ files {
     'config/shared.lua',
     'html/*',
 }
-
-dependency 'PolyZone'
 
 lua54 'yes'
 use_experimental_fxv2_oal 'yes'

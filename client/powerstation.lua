@@ -133,23 +133,24 @@ end)
 
 CreateThread(function()
     for k = 1, #powerStationConfig do
-        local stationZone = BoxZone:Create(powerStationConfig[k].coords, 1.0, 1.0, {
+        local stationZone = lib.zones.box({
             name = 'powerstation_coords_'..k,
-            heading = 90.0,
-            minZ = powerStationConfig[k].coords.z - 1,
-            maxZ = powerStationConfig[k].coords.z + 1,
-            debugPoly = false
-        })
-        stationZone:onPlayerInOut(function(inside)
-            if inside and not powerStationConfig[k].hit then
-                closestStation = k
-                -- Config.ShowRequiredItems(requiredItems, true)
-            else
+            coords = powerStationConfig[k].coords,
+            size = vec3(1, 1, 2),
+            rotation = 75.0,
+            debug = false,
+            onEnter = function()
+                if not powerStationConfig[k].hit then
+                    closestStation = k
+                    -- Config.ShowRequiredItems(requiredItems, true)
+                end
+            end,
+            onExit = function()
                 if closestStation == k then
                     closestStation = 0
                     -- Config.ShowRequiredItems(requiredItems, false)
                 end
-            end
-        end)
+            end,
+        })
     end
 end)
