@@ -60,18 +60,6 @@ CreateThread(function()
         size = vec3(1, 1, 2),
         rotation = paletoConfig.heading.closed,
         debug = false,
-        onEnter = function()
-            if not paletoConfig.isOpened then
-                -- Config.ShowRequiredItems({
-                --     [1] = {name = exports.ox_inventory:Items().security_card_01.name, image = exports.ox_inventory:Items().security_card_01.image}
-                -- }, true)
-            end
-        end,
-        onExit = function()
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().security_card_01.name, image = exports.ox_inventory:Items().security_card_01.image}
-            -- }, false)
-        end,
     })
     lib.zones.box({
         name = 'paleto_coords_thermite_1',

@@ -125,18 +125,6 @@ CreateThread(function()
         size = vec3(1, 1, 2),
         rotation = pacificConfig.heading.closed,
         debug = false,
-        onEnter = function()
-            if not pacificConfig.isOpened then
-                -- Config.ShowRequiredItems({
-                --     [1] = {name = exports.ox_inventory:Items().security_card_02.name, image = exports.ox_inventory:Items().security_card_02.image}
-                -- }, true)
-            end
-        end,
-        onExit = function()
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().security_card_02.name, image = exports.ox_inventory:Items().security_card_02.image}
-            -- }, false)
-        end,
     })
     lib.zones.box({
         name = 'pacific_coords_electronickit',
@@ -144,20 +132,6 @@ CreateThread(function()
         size = vec3(1, 1, 2),
         rotation = pacificConfig.heading.closed,
         debug = false,
-        onEnter = function()
-            if not pacificConfig.isOpened then
-                -- Config.ShowRequiredItems({
-                --     [1] = {name = exports.ox_inventory:Items().electronickit.name, image = exports.ox_inventory:Items().electronickit.image},
-                --     [2] = {name = exports.ox_inventory:Items().trojan_usb.name, image = exports.ox_inventory:Items().trojan_usb.image}
-                -- }, true)
-            end
-        end,
-        onExit = function()
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().electronickit.name, image = exports.ox_inventory:Items().electronickit.image},
-            --     [2] = {name = exports.ox_inventory:Items().trojan_usb.name, image = exports.ox_inventory:Items().trojan_usb.image}
-            -- }, false)
-        end,
     })
     lib.zones.box({
         name = 'pacific_coords_thermite_1',
