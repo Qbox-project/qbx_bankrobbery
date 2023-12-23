@@ -119,132 +119,109 @@ end)
 -- Threads
 
 CreateThread(function()
-    local bankCardBZone = BoxZone:Create(pacificConfig.coords[1], 1.0, 1.0, {
+    lib.zones.box({
         name = 'pacific_coords_bankcardb',
-        heading = pacificConfig.heading.closed,
-        minZ = pacificConfig.coords[1].z - 1,
-        maxZ = pacificConfig.coords[1].z + 1,
-        debugPoly = false
+        coords = pacificConfig.coords[1],
+        size = vec3(1, 1, 2),
+        rotation = pacificConfig.heading.closed,
+        debug = false,
     })
-    bankCardBZone:onPlayerInOut(function(inside)
-        inBankCardBZone = inside
-        if inside and not pacificConfig.isOpened then
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().security_card_02.name, image = exports.ox_inventory:Items().security_card_02.image}
-            -- }, true)
-        else
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().security_card_02.name, image = exports.ox_inventory:Items().security_card_02.image}
-            -- }, false)
-        end
-    end)
-    local electronickitZone = BoxZone:Create(pacificConfig.coords[2], 1.0, 1.0, {
+    lib.zones.box({
         name = 'pacific_coords_electronickit',
-        heading = pacificConfig.heading.closed,
-        minZ = pacificConfig.coords[2].z - 1,
-        maxZ = pacificConfig.coords[2].z + 1,
-        debugPoly = false
+        coords = pacificConfig.coords[2],
+        size = vec3(1, 1, 2),
+        rotation = pacificConfig.heading.closed,
+        debug = false,
     })
-    electronickitZone:onPlayerInOut(function(inside)
-        inElectronickitZone = inside
-        if inside and not pacificConfig.isOpened then
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().electronickit.name, image = exports.ox_inventory:Items().electronickit.image},
-            --     [2] = {name = exports.ox_inventory:Items().trojan_usb.name, image = exports.ox_inventory:Items().trojan_usb.image}
-            -- }, true)
-        else
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().electronickit.name, image = exports.ox_inventory:Items().electronickit.image},
-            --     [2] = {name = exports.ox_inventory:Items().trojan_usb.name, image = exports.ox_inventory:Items().trojan_usb.image}
-            -- }, false)
-        end
-    end)
-    local thermite1Zone = BoxZone:Create(pacificConfig.thermite[1].coords, 1.0, 1.0, {
+    lib.zones.box({
         name = 'pacific_coords_thermite_1',
-        heading = pacificConfig.heading.closed,
-        minZ = pacificConfig.thermite[1].coords.z - 1,
-        maxZ = pacificConfig.thermite[1].coords.z + 1,
-        debugPoly = false
-    })
-    thermite1Zone:onPlayerInOut(function(inside)
-        if inside and not pacificConfig.thermite[1].isOpened then
-            currentThermiteGate = pacificConfig.thermite[1].doorId
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
-            -- }, true)
-        else
+        coords = pacificConfig.thermite[1].coords,
+        size = vec3(1, 1, 2),
+        rotation = pacificConfig.heading.closed,
+        debug = false,
+        onEnter = function()
+            if not pacificConfig.thermite[1].isOpened then
+                currentThermiteGate = pacificConfig.thermite[1].doorId
+                -- Config.ShowRequiredItems({
+                --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
+                -- }, true)
+            end
+        end,
+        onExit = function()
             if currentThermiteGate == pacificConfig.thermite[1].doorId then
                 currentThermiteGate = 0
                 -- Config.ShowRequiredItems({
                 --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
                 -- }, false)
             end
-        end
-    end)
-    local thermite2Zone = BoxZone:Create(pacificConfig.thermite[2].coords, 1.0, 1.0, {
-        name = 'pacific_coords_thermite_2',
-        heading = pacificConfig.heading.closed,
-        minZ = pacificConfig.thermite[2].coords.z - 1,
-        maxZ = pacificConfig.thermite[2].coords.z + 1,
-        debugPoly = false
+        end,
     })
-    thermite2Zone:onPlayerInOut(function(inside)
-        if inside and not pacificConfig.thermite[2].isOpened then
-            currentThermiteGate = pacificConfig.thermite[2].doorId
-            -- Config.ShowRequiredItems({
-            --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
-            -- }, true)
-        else
+    lib.zones.box({
+        name = 'pacific_coords_thermite_2',
+        coords = pacificConfig.thermite[2].coords,
+        size = vec3(1, 1, 2),
+        rotation = pacificConfig.heading.closed,
+        debug = false,
+        onEnter = function()
+            if not pacificConfig.thermite[2].isOpened then
+                currentThermiteGate = pacificConfig.thermite[2].doorId
+                -- Config.ShowRequiredItems({
+                --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
+                -- }, true)
+            end
+        end,
+        onExit = function()
             if currentThermiteGate == pacificConfig.thermite[2].doorId then
                 currentThermiteGate = 0
                 -- Config.ShowRequiredItems({
                 --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
                 -- }, false)
             end
-        end
-    end)
+        end,
+    })
     for k in pairs(pacificConfig.lockers) do
         if config.useTarget then
-            exports['qb-target']:AddBoxZone('pacific_coords_locker_'..k, pacificConfig.lockers[k].coords, 1.0, 1.0, {
-                name = 'pacific_coords_locker_'..k,
-                heading = pacificConfig.heading.closed,
-                minZ = pacificConfig.lockers[k].coords.z - 1,
-                maxZ = pacificConfig.lockers[k].coords.z + 1,
-                debugPoly = false
-            }, {
+            exports.ox_target:addBoxZone({
+                coords = pacificConfig.lockers[k].coords,
+                size = vec3(1, 1, 2),
+                rotation = pacificConfig.heading.closed,
+                debug = false,
+                drawSprite = true,
                 options = {
                     {
-                        action = function()
-                            openLocker('pacific', k)
-                        end,
+                        label = Lang:t('general.break_safe_open_option_target'),
+                        name = 'pacific_coords_locker_'..k,
+                        icon = 'fa-solid fa-vault',
+                        distance = 1.5,
                         canInteract = function()
                             return not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened
                         end,
-                        icon = 'fa-solid fa-vault',
-                        label = Lang:t('general.break_safe_open_option_target'),
+                        onSelect = function()
+                            openLocker('pacific', k)
+                        end,
                     },
                 },
-                distance = 1.5
             })
         else
-            local lockerZone = BoxZone:Create(pacificConfig.lockers[k].coords, 1.0, 1.0, {
+            lib.zones.box({
                 name = 'pacific_coords_locker_'..k,
-                heading = pacificConfig.heading.closed,
-                minZ = pacificConfig.lockers[k].coords.z - 1,
-                maxZ = pacificConfig.lockers[k].coords.z + 1,
-                debugPoly = false
-            })
-            lockerZone:onPlayerInOut(function(inside)
-                if inside and not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened then
-                    exports['qbx-core']:DrawText(Lang:t('general.break_safe_open_option_drawtext'), 'right')
-                    currentLocker = k
-                else
+                coords = pacificConfig.lockers[k].coords,
+                size = vec3(1, 1, 2),
+                rotation = pacificConfig.heading.closed,
+                debug = false,
+                onEnter = function()
+                    if not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened then
+                        lib.showTextUI(Lang:t('general.break_safe_open_option_drawtext'), {position = 'right-center'})
+                        currentLocker = k
+                    end
+                end,
+                onExit = function()
                     if currentLocker == k then
                         currentLocker = 0
-                        exports['qbx-core']:HideText()
+                        lib.hideTextUI()
                     end
-                end
-            end)
+                end,
+            })
         end
     end
     if not config.useTarget then
@@ -254,9 +231,9 @@ CreateThread(function()
                 if currentLocker ~= 0 and not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[currentLocker].isBusy and not pacificConfig.lockers[currentLocker].isOpened then
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
-                        exports['qbx-core']:KeyPressed()
+                        exports.qbx_core:KeyPressed()
                         Wait(500)
-                        exports['qbx-core']:HideText()
+                        lib.hideTextUI()
                         if CurrentCops >= config.minPacificPolice then
                             openLocker('pacific', currentLocker)
                         else

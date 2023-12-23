@@ -451,55 +451,56 @@ end)
 
 CreateThread(function()
     for i = 1, #sharedConfig.smallBanks do
-        local bankZone = BoxZone:Create(sharedConfig.smallBanks[i].coords, 1.0, 1.0, {
+        lib.zones.box({
             name = 'fleeca_'..i..'_coords_electronickit',
-            heading = sharedConfig.smallBanks[i].coords.closed,
-            minZ = sharedConfig.smallBanks[i].coords.z - 1,
-            maxZ = sharedConfig.smallBanks[i].coords.z + 1,
-            debugPoly = false
+            coords = sharedConfig.smallBanks[i].coords,
+            size = vec3(1, 1, 2),
+            rotation = sharedConfig.smallBanks[i].coords.closed,
+            debug = false
         })
         for k in pairs(sharedConfig.smallBanks[i].lockers) do
             if config.useTarget then
-                exports['qb-target']:AddBoxZone('fleeca_'..i..'_coords_locker_'..k, sharedConfig.smallBanks[i].lockers[k].coords, 1.0, 1.0, {
-                    name = 'fleeca_'..i..'_coords_locker_'..k,
-                    heading = sharedConfig.smallBanks[i].heading.closed,
-                    minZ = sharedConfig.smallBanks[i].lockers[k].coords.z - 1,
-                    maxZ = sharedConfig.smallBanks[i].lockers[k].coords.z + 1,
-                    debugPoly = false
-                }, {
+                exports.ox_target:addBoxZone({
+                    coords = sharedConfig.smallBanks[i].lockers[k].coords,
+                    size = vec3(1, 1, 2),
+                    rotation = sharedConfig.smallBanks[i].heading.closed,
+                    debug = false,
+                    drawSprite = true,
                     options = {
                         {
-                            action = function()
-                                openLocker(closestBank, k)
-                            end,
+                            label = Lang:t('general.break_safe_open_option_target'),
+                            name = 'fleeca_'..i..'_coords_locker_'..k,
+                            icon = 'fa-solid fa-vault',
+                            distance = 1.5,
                             canInteract = function()
                                 return closestBank ~= 0 and not isDrilling and sharedConfig.smallBanks[i].isOpened and not sharedConfig.smallBanks[i].lockers[k].isOpened and not sharedConfig.smallBanks[i].lockers[k].isBusy
                             end,
-                            icon = 'fa-solid fa-vault',
-                            label = Lang:t('general.break_safe_open_option_target'),
+                            onSelect = function()
+                                openLocker(closestBank, k)
+                            end,
                         },
                     },
-                    distance = 1.5
                 })
             else
-                local lockerZone = BoxZone:Create(sharedConfig.smallBanks[i].lockers[k].coords, 1.0, 1.0, {
+                lib.zones.box({
                     name = 'fleeca_'..i..'_coords_locker_'..k,
-                    heading = sharedConfig.smallBanks[i].heading.closed,
-                    minZ = sharedConfig.smallBanks[i].lockers[k].coords.z - 1,
-                    maxZ = sharedConfig.smallBanks[i].lockers[k].coords.z + 1,
-                    debugPoly = false
-                })
-                lockerZone:onPlayerInOut(function(inside)
-                    if inside and closestBank ~= 0 and not isDrilling and sharedConfig.smallBanks[i].isOpened and not sharedConfig.smallBanks[i].lockers[k].isOpened and not sharedConfig.smallBanks[i].lockers[k].isBusy then
-                        lib.showTextUI(Lang:t('general.break_safe_open_option_drawtext'), {position = 'left-center'})
-                        currentLocker = k
-                    else
+                    coords = sharedConfig.smallBanks[i].lockers[k].coords,
+                    size = vec3(1, 1, 2),
+                    rotation = sharedConfig.smallBanks[i].heading.closed,
+                    debug = false,
+                    onEnter = function()
+                        if closestBank ~= 0 and not isDrilling and sharedConfig.smallBanks[i].isOpened and not sharedConfig.smallBanks[i].lockers[k].isOpened and not sharedConfig.smallBanks[i].lockers[k].isBusy then
+                            lib.showTextUI(Lang:t('general.break_safe_open_option_drawtext'), {position = 'right-center'})
+                            currentLocker = k
+                        end
+                    end,
+                    onExit = function()
                         if currentLocker == k then
                             currentLocker = 0
                             lib.hideTextUI()
                         end
-                    end
-                end)
+                    end,
+                })
             end
         end
     end
