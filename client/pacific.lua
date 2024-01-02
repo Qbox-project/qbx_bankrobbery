@@ -15,52 +15,39 @@ local function onHackPacificDone(success)
 end
 
 RegisterNetEvent('qb-bankrobbery:UseBankcardB', function()
-    local pos = GetEntityCoords(cache.ped)
-    if math.random(1, 100) > 85 or IsWearingGloves() then return end
-    TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
+    DropFingerprint()
+
     if not inBankCardBZone then return end
+
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
-    if not isBusy then
-        if CurrentCops >= config.minPacificPolice then
-            if not pacificConfig.isOpened then
-                -- Config.ShowRequiredItems({
-                --     [1] = {name = exports.ox_inventory:Items().security_card_02.name, image = exports.ox_inventory:Items().security_card_02.image}
-                -- }, false)
-                lib.requestAnimDict('anim@gangops@facility@servers@')
-                TaskPlayAnim(cache.ped, 'anim@gangops@facility@servers@', 'hotwire', 3.0, 3.0, -1, 1, 0, false, false, false)
-                if lib.progressBar({
-                    duration = 75000,
-                    label = Lang:t('general.validating_bankcard'),
-                    canCancel = true,
-                    useWhileDead = false,
-                    disable = {
-                        move = true,
-                        car = true,
-                        mouse = false,
-                        combat = true
-                    },
-                    anim = {
-                        dict = 'anim@gangops@facility@servers@',
-                        clip = 'hotwire',
-                        flag = 1
-                    }
-                }) then
-                    --Config.DoorlockAction(1, false)
-                    TriggerServerEvent('qb-bankrobbery:server:removeBankCard', '02')
-                    if copsCalled or not pacificConfig.alarm then return end
-                    TriggerServerEvent('qb-bankrobbery:server:callCops', 'pacific', 0, pos)
-                    copsCalled = true
-                else
-                    exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
-                end
-            else
-                exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error')
-            end
-        else
-            exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPacificPolice}), 'error')
-        end
+    if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
+
+    if not CurrentCops >= config.minPacificPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPacificPolice}), 'error') end
+    if pacificConfig.isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
+
+    if lib.progressBar({
+        duration = 75000,
+        label = Lang:t('general.validating_bankcard'),
+        canCancel = true,
+        useWhileDead = false,
+        disable = {
+            move = true,
+            car = true,
+            mouse = false,
+            combat = true
+        },
+        anim = {
+            dict = 'anim@gangops@facility@servers@',
+            clip = 'hotwire',
+            flag = 1
+        }
+    }) then
+        TriggerServerEvent('qb-bankrobbery:server:removeBankCard', '02')
+        if copsCalled or not pacificConfig.alarm then return end
+        TriggerServerEvent('qb-bankrobbery:server:callCops', 'pacific', 0, pacificConfig.coords)
+        copsCalled = true
     else
-        exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500)
+        exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
     end
 end)
 

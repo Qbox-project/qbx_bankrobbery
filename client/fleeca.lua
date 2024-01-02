@@ -117,8 +117,7 @@ end
 --- @return nil
 function openLocker(bankId, lockerId) -- Globally Used
     local pos = GetEntityCoords(cache.ped)
-    if math.random(1, 100) > 65 or IsWearingGloves() then return end
-    TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
+    DropFingerprint()
     TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', true)
     if bankId == 'paleto' then
         local hasItem = exports.ox_inventory:Search('count', 'drill') > 0
@@ -258,58 +257,45 @@ end
 -- Events
 
 RegisterNetEvent('electronickit:UseElectronickit', function()
-    local pos = GetEntityCoords(cache.ped)
-    if math.random(1, 100) > 85 or IsWearingGloves() then return end
-    TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
+    DropFingerprint()
+
     if closestBank == 0 or not inElectronickitZone then return end
+
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
-    if not isBusy then
-        if CurrentCops >= config.minFleecaPolice then
-            if not sharedConfig.smallBanks[closestBank].isOpened then
-                local hasItem = (exports.ox_inventory:Search('count', 'trojan_usb') > 0) and (exports.ox_inventory:Search('count', 'electronickit') > 0)
-                if hasItem then
-                    -- Config.ShowRequiredItems({
-                    --     [1] = {name = exports.ox_inventory:Items().electronickit.name, image = exports.ox_inventory:Items().electronickit.image},
-                    --     [2] = {name = exports.ox_inventory:Items().trojan_usb.name, image = exports.ox_inventory:Items().trojan_usb.image}
-                    -- }, false)
-                    if lib.progressBar({
-                        duration = 7500,
-                        label = Lang:t('general.connecting_hacking_device'),
-                        canCancel = true,
-                        useWhileDead = false,
-                        disable = {
-                            move = true,
-                            car = true,
-                            mouse = false,
-                            combat = true
-                        },
-                        anim = {
-                            dict = 'anim@gangops@facility@servers@',
-                            clip = 'hotwire',
-                            flag = 1
-                        }
-                    }) then
-                        TriggerServerEvent('qb-bankrobbery:server:removeElectronicKit')
-                        TriggerEvent('mhacking:show')
-                        TriggerEvent('mhacking:start', math.random(6, 7), math.random(12, 15), onHackDone)
-                        if copsCalled or not sharedConfig.smallBanks[closestBank].alarm then return end
-                        TriggerServerEvent('qb-bankrobbery:server:callCops', 'small', closestBank, pos)
-                        copsCalled = true
-                        SetTimeout(60000 * config.outlawCooldown, function() copsCalled = false end)
-                    else
-                        exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
-                    end
-                else
-                    exports.qbx_core:Notify(Lang:t('error.missing_item'), 'error')
-                end
-            else
-                exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error')
-            end
-        else
-            exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error')
-        end
+    if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
+
+    if not CurrentCops >= config.minFleecaPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error') end
+    if sharedConfig.smallBanks[closestBank].isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
+
+    local hasItems = (exports.ox_inventory:Search('count', 'trojan_usb') > 0) and (exports.ox_inventory:Search('count', 'electronickit') > 0)
+    if not hasItems then return exports.qbx_core:Notify(Lang:t('error.missing_item'), 'error') end
+
+    if lib.progressBar({
+        duration = 7500,
+        label = Lang:t('general.connecting_hacking_device'),
+        canCancel = true,
+        useWhileDead = false,
+        disable = {
+            move = true,
+            car = true,
+            mouse = false,
+            combat = true
+        },
+        anim = {
+            dict = 'anim@gangops@facility@servers@',
+            clip = 'hotwire',
+            flag = 1
+        }
+    }) then
+        TriggerServerEvent('qb-bankrobbery:server:removeElectronicKit')
+        TriggerEvent('mhacking:show')
+        TriggerEvent('mhacking:start', math.random(6, 7), math.random(12, 15), onHackDone)
+        if copsCalled or not sharedConfig.smallBanks[closestBank].alarm then return end
+        TriggerServerEvent('qb-bankrobbery:server:callCops', 'small', closestBank, sharedConfig.smallBanks[closestBank].coords)
+        copsCalled = true
+        SetTimeout(60000 * config.outlawCooldown, function() copsCalled = false end)
     else
-        exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500)
+        exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
     end
 end)
 
