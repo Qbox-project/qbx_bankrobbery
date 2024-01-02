@@ -22,7 +22,7 @@ RegisterNetEvent('qb-bankrobbery:UseBankcardB', function()
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
     if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
 
-    if not CurrentCops >= config.minPacificPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPacificPolice}), 'error') end
+    if not (CurrentCops >= config.minPacificPolice) then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPacificPolice}), 'error') end
     if pacificConfig.isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
 
     if lib.progressBar({

@@ -1,3 +1,5 @@
+local config = require 'config.client'
+
 function DropFingerprint()
     if IsWearingGloves() then return end
 
