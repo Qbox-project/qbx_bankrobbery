@@ -5,49 +5,41 @@ local currentLocker = 0
 local copsCalled = false
 
 RegisterNetEvent('qb-bankrobbery:UseBankcardA', function()
-    local pos = GetEntityCoords(cache.ped)
-    if math.random(1, 100) > 85 or IsWearingGloves() then return end
-    TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
+    DropFingerprint()
+
     if not inBankCardAZone then return end
+
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
-    if not isBusy then
-        if CurrentCops >= config.minPaletoPolice then
-            if not paletoConfig.isOpened then
-                -- Config.ShowRequiredItems(nil, false)
-                if lib.progressBar({
-                    duration = 7500,
-                    label = Lang:t('general.validating_bankcard'),
-                    canCancel = true,
-                    useWhileDead = false,
-                    disable = {
-                        move = true,
-                        car = true,
-                        mouse = false,
-                        combat = true
-                    },
-                    anim = {
-                        dict = 'anim@gangops@facility@servers@',
-                        clip = 'hotwire',
-                        flag = 1
-                    }
-                }) then
-                    TriggerServerEvent('qb-bankrobbery:server:setBankState', 'paleto')
-                    TriggerServerEvent('qb-bankrobbery:server:removeBankCard', '01')
-                    --Config.DoorlockAction(4, false)
-                    if copsCalled or not paletoConfig.alarm then return end
-                    TriggerServerEvent('qb-bankrobbery:server:callCops', 'paleto', 0, pos)
-                    copsCalled = true
-                else
-                    exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
-                end
-            else
-                exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error')
-            end
-        else
-            exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error')
-        end
-    else
-        exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500)
+    if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
+
+    if CurrentCops < config.minPaletoPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error') end
+    if paletoConfig.isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
+
+    if lib.progressBar({
+        duration = 7500,
+        label = Lang:t('general.validating_bankcard'),
+        canCancel = true,
+        useWhileDead = false,
+        disable = {
+            move = true,
+            car = true,
+            mouse = false,
+            combat = true
+        },
+        anim = {
+            dict = 'anim@gangops@facility@servers@',
+            clip = 'hotwire',
+            flag = 1
+        }
+    }) then -- if completed
+        TriggerServerEvent('qb-bankrobbery:server:setBankState', 'paleto')
+        TriggerServerEvent('qb-bankrobbery:server:removeBankCard', '01')
+
+        if copsCalled or not paletoConfig.alarm then return end
+        TriggerServerEvent('qb-bankrobbery:server:callCops', 'paleto', 0, paletoConfig.coords)
+        copsCalled = true
+    else -- if canceled
+        exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
     end
 end)
 
