@@ -19,12 +19,12 @@ local function resetBankDoors()
     for k in pairs(sharedConfig.smallBanks) do
         local coords = sharedConfig.smallBanks[k].coords
         local object = GetClosestObjectOfType(coords.x, coords.y, coords.z, 5.0, sharedConfig.smallBanks[k].object, false, false, false)
-        resetDoor(object, sharedConfig.smallBanks[k].isOpened)
+        resetDoor(object, sharedConfig.smallBanks[k])
     end
 
     local paletoCoords = sharedConfig.bigBanks.paleto.coords
     local paletoObject = GetClosestObjectOfType(paletoCoords.x, paletoCoords.y, paletoCoords.z, 5.0, sharedConfig.bigBanks.paleto.object, false, false, false)
-    resetDoor(paletoObject, sharedConfig.bigBanks.paleto.)
+    resetDoor(paletoObject, sharedConfig.bigBanks.paleto)
 
     local pacificCoords = sharedConfig.bigBanks.pacific.coords[2]
     local pacificObject = GetClosestObjectOfType(pacificCoords.x, pacificCoords.y, pacificCoords.z, 20.0, sharedConfig.bigBanks.pacific.object, false, false, false)
