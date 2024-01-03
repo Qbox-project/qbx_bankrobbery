@@ -17,6 +17,7 @@ shared_scripts {
 
 client_scripts {
     '@qbx_core/modules/playerdata.lua',
+    'client/main.lua',
     'client/fleeca.lua',
     'client/pacific.lua',
     'client/powerstation.lua',
