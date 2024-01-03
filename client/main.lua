@@ -56,7 +56,7 @@ end)
 --- @param bankId string | number
 --- @param lockerId number
 --- @return nil
-function openLocker(bankId, lockerId) -- Globally Used
+function OpenLocker(bankId, lockerId) -- Globally Used
     local pos = GetEntityCoords(cache.ped)
     DropFingerprint()
     TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', true)

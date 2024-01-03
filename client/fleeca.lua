@@ -151,7 +151,7 @@ CreateThread(function()
                                 return closestBank ~= 0 and not isDrilling and sharedConfig.smallBanks[i].isOpened and not sharedConfig.smallBanks[i].lockers[k].isOpened and not sharedConfig.smallBanks[i].lockers[k].isBusy
                             end,
                             onSelect = function()
-                                openLocker(closestBank, k)
+                                OpenLocker(closestBank, k)
                             end,
                         },
                     },
@@ -190,7 +190,7 @@ CreateThread(function()
                             lib.hideTextUI()
                             Wait(500)
                             if CurrentCops >= config.minFleecaPolice then
-                                openLocker(closestBank, currentLocker)
+                                OpenLocker(closestBank, currentLocker)
                             else
                                 exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error')
                             end

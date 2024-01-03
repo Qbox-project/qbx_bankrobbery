@@ -184,7 +184,7 @@ CreateThread(function()
                             return not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened
                         end,
                         onSelect = function()
-                            openLocker('pacific', k)
+                            OpenLocker('pacific', k)
                         end,
                     },
                 },
@@ -222,7 +222,7 @@ CreateThread(function()
                         Wait(500)
                         lib.hideTextUI()
                         if CurrentCops >= config.minPacificPolice then
-                            openLocker('pacific', currentLocker)
+                            OpenLocker('pacific', currentLocker)
                         else
                             exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPacificPolice}), 'error')
                         end
