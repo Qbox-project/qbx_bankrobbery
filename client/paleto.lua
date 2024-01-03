@@ -94,7 +94,7 @@ CreateThread(function()
                             return not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened
                         end,
                         onSlect = function()
-                            openLocker('paleto', k)
+                            OpenLocker('paleto', k)
                         end,
                     },
                 },
@@ -132,7 +132,7 @@ CreateThread(function()
                         Wait(500)
                         lib.hideTextUI()
                         if CurrentCops >= config.minPaletoPolice then
-                            openLocker('paleto', currentLocker)
+                            OpenLocker('paleto', currentLocker)
                         else
                             exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error')
                         end
