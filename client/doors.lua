@@ -68,7 +68,7 @@ RegisterNetEvent('qb-bankrobbery:client:ClearTimeoutDoors', function()
     --Config.DoorlockAction(4, true)
     local paletoObject = GetClosestObjectOfType(sharedConfig.bigBanks.paleto.coords.x, sharedConfig.bigBanks.paleto.coords.y, sharedConfig.bigBanks.paleto.coords.z, 5.0, sharedConfig.bigBanks.paleto.object, false, false, false)
     if paletoObject ~= 0 then
-        SetEntityHeading(paletoObject, bigBanks.paleto.heading.closed)
+        SetEntityHeading(paletoObject, sharedConfig.bigBanks.paleto.heading.closed)
     end
     local object = GetClosestObjectOfType(sharedConfig.bigBanks.pacific.coords[2].x, sharedConfig.bigBanks.pacific.coords[2].y, sharedConfig.bigBanks.pacific.coords[2].z, 20.0, sharedConfig.bigBanks.pacific.object, false, false, false)
     if object ~= 0 then
