@@ -10,8 +10,8 @@ local copsCalled = false
 local refreshed = false
 local currentLocker = 0
 
-local function resetDoor(object, isBankOpen, closedHeading, openHeading)
-    local heading = isBankOpen and openHeading or closedHeading
+local function resetDoor(object, bank)
+    local heading = bank.isOpened and bank.heading.open or bank.heading.closed
     SetEntityHeading(object, heading)
 end
 
@@ -19,16 +19,16 @@ local function resetBankDoors()
     for k in pairs(sharedConfig.smallBanks) do
         local coords = sharedConfig.smallBanks[k].coords
         local object = GetClosestObjectOfType(coords.x, coords.y, coords.z, 5.0, sharedConfig.smallBanks[k].object, false, false, false)
-        resetDoor(object, sharedConfig.smallBanks[k].isOpened, sharedConfig.smallBanks[k].heading.closed, sharedConfig.smallBanks[k].heading.open)
+        resetDoor(object, sharedConfig.smallBanks[k].isOpened)
     end
 
     local paletoCoords = sharedConfig.bigBanks.paleto.coords
     local paletoObject = GetClosestObjectOfType(paletoCoords.x, paletoCoords.y, paletoCoords.z, 5.0, sharedConfig.bigBanks.paleto.object, false, false, false)
-    resetDoor(paletoObject, sharedConfig.bigBanks.paleto.isOpened, sharedConfig.bigBanks.paleto.heading.closed, sharedConfig.bigBanks.paleto.heading.open)
+    resetDoor(paletoObject, sharedConfig.bigBanks.paleto.)
 
     local pacificCoords = sharedConfig.bigBanks.pacific.coords[2]
     local pacificObject = GetClosestObjectOfType(pacificCoords.x, pacificCoords.y, pacificCoords.z, 20.0, sharedConfig.bigBanks.pacific.object, false, false, false)
-    resetDoor(pacificObject, sharedConfig.bigBanks.pacific.isOpened, sharedConfig.bigBanks.pacific.heading.closed, sharedConfig.bigBanks.pacific.heading.open)
+    resetDoor(pacificObject, sharedConfig.bigBanks.pacific)
 end
 
 AddEventHandler('onResourceStop', function(resource)
