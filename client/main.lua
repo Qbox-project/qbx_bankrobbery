@@ -29,6 +29,11 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     isLoggedIn = false
 end)
 
+RegisterNetEvent('police:SetCopCount')
+AddEventHandler('police:SetCopCount', function(amount)
+    TriggerServerEvent('qbx_bankrobbery:server:setCopCount', amount)
+end)
+
 RegisterNetEvent('qb-bankrobbery:client:setBankState', function(bankId)
     if bankId == 'paleto' then
         sharedConfig.bigBanks.paleto.isOpened = true

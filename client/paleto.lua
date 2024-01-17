@@ -3,6 +3,7 @@ local paletoConfig = require 'config.shared'.bigBanks.paleto
 local inBankCardAZone = false
 local currentLocker = 0
 local copsCalled = false
+local currentCops = 0
 
 RegisterNetEvent('qb-bankrobbery:UseBankcardA', function()
     DropFingerprint()
@@ -12,7 +13,8 @@ RegisterNetEvent('qb-bankrobbery:UseBankcardA', function()
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
     if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
 
-    if CurrentCops < config.minPaletoPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error') end
+    currentCops = lib.callback.await('qbx_bankrobbery:server:getCurrentCopCount', false)
+    if currentCops < config.minPaletoPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error') end
     if paletoConfig.isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
 
     if lib.progressBar({
@@ -131,7 +133,7 @@ CreateThread(function()
                         exports.qbx_core:KeyPressed()
                         Wait(500)
                         lib.hideTextUI()
-                        if CurrentCops >= config.minPaletoPolice then
+                        if currentCops >= config.minPaletoPolice then
                             OpenLocker('paleto', currentLocker)
                         else
                             exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error')

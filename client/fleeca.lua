@@ -1,6 +1,6 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
---currentThermiteGate = 0
+currentThermiteGate = 0
 local currentCops = 0
 local closestBank = 0
 local inElectronickitZone = false
@@ -19,12 +19,13 @@ end
 
 RegisterNetEvent('electronickit:UseElectronickit', function()
     DropFingerprint()
-    currentCops = lib.callback.await('qbx_bankrobbery:server:getCurrentCopCount')
+
     if closestBank == 0 or not inElectronickitZone then return end
 
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
     if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
-
+    
+    currentCops = lib.callback.await('qbx_bankrobbery:server:getCurrentCopCount', false)
     if currentCops < config.minFleecaPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error') end
     if sharedConfig.smallBanks[closestBank].isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
 

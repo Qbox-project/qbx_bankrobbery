@@ -4,6 +4,7 @@ local closestStation = 0
 local currentStation = 0
 local currentFires = {}
 local currentGate = 0
+local currentCops = 0
 
 --- This will create a fire at the given coords and for the given time
 --- @param coords vector3
@@ -43,7 +44,8 @@ RegisterNetEvent('thermite:UseThermite', function()
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         local dist = #(pos - powerStationConfig[closestStation].coords)
         if dist < 1.5 then
-            if CurrentCops >= config.minThermitePolice then
+            currentCops = lib.callback.await('qbx_bankrobbery:server:getCurrentCopCount', false)
+            if currentCops >= config.minThermitePolice then
                 if not powerStationConfig[closestStation].hit then
                     lib.requestAnimDict('weapon@w_sp_jerrycan')
                     TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, 180, 49, 0, false, false, false)
@@ -64,7 +66,7 @@ RegisterNetEvent('thermite:UseThermite', function()
     elseif currentThermiteGate ~= 0 then
         if math.random(1, 100) > 85 or IsWearingGloves() then return end
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
-        if CurrentCops >= config.minThermitePolice then
+        if currentCops >= config.minThermitePolice then
             currentGate = currentThermiteGate
             lib.requestAnimDict('weapon@w_sp_jerrycan')
             TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, -1, 49, 0, false, false, false)
@@ -92,6 +94,7 @@ end)
 RegisterNUICallback('thermitefailed', function(_, cb)
     local success = lib.callback.await('thermite:server:check', false)
     if success then
+        exports.qbx_core:Notify(Lang:t('error.failed_message'), 'error')
         PlaySound(-1, 'Place_Prop_Fail', 'DLC_Dmod_Prop_Editor_Sounds', false, 0, true)
         ClearPedTasks(cache.ped)
         local coords = GetEntityCoords(cache.ped)
@@ -104,6 +107,7 @@ end)
 RegisterNUICallback('thermitesuccess', function(_, cb)
     local success = lib.callback.await('thermite:server:check', false)
     if success then
+        exports.qbx_core:Notify(Lang:t('success.success_message'), 'success')
         ClearPedTasks(cache.ped)
         local time = 3
         local coords = GetEntityCoords(cache.ped)
@@ -138,12 +142,10 @@ CreateThread(function()
             coords = powerStationConfig[k].coords,
             size = vec3(1, 1, 2),
             rotation = 75.0,
-            debug = false,
+            debug = config.debugPoly,
             onEnter = function()
-                if not powerStationConfig[k].hit then
-                    closestStation = k
-                    -- Config.ShowRequiredItems(requiredItems, true)
-                end
+                closestStation = k
+                -- Config.ShowRequiredItems(requiredItems, true)
             end,
             onExit = function()
                 if closestStation == k then
