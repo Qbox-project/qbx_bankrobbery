@@ -6,6 +6,7 @@ local Translations = {
     },
     error = {
         cancel_message = "Annulleret",
+        failed_message = "Failed",
         safe_too_strong = "Det ser ud til, at safelåsen er for stærk...",
         missing_item = "Du mangler en genstand...",
         bank_already_open = "Banken er allerede åben...",

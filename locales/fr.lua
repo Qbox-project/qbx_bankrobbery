@@ -6,6 +6,7 @@ local Translations = {
     },
     error = {
         cancel_message = "Annulé",
+        failed_message = "Failed",
         safe_too_strong = "Il semble que le verrou de la banque soit trop fort...",
         missing_item = "Il vous manque un objet...",
         bank_already_open = "La banque est déjà ouverte...",
