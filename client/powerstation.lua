@@ -39,12 +39,12 @@ end)
 
 RegisterNetEvent('thermite:UseThermite', function()
     local pos = GetEntityCoords(cache.ped)
+    currentCops = exports.qbx_core:GetDutyCountType('leo')
     if closestStation ~= 0 then
         if math.random(1, 100) > 85 or IsWearingGloves() then return end
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         local dist = #(pos - powerStationConfig[closestStation].coords)
         if dist < 1.5 then
-            currentCops = lib.callback.await('qbx_bankrobbery:server:getCurrentCopCount', false)
             if currentCops >= config.minThermitePolice then
                 if not powerStationConfig[closestStation].hit then
                     lib.requestAnimDict('weapon@w_sp_jerrycan')

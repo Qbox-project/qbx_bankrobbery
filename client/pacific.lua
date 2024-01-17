@@ -23,7 +23,7 @@ RegisterNetEvent('qb-bankrobbery:UseBankcardB', function()
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
     if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
     
-    currentCops = lib.callback.await('qbx_bankrobbery:server:getCurrentCopCount')
+    currentCops = exports.qbx_core:GetDutyCountType('leo')
     if currentCops < config.minPacificPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPacificPolice}), 'error') end
     if pacificConfig.isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
 
@@ -58,6 +58,7 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
     if not inElectronickitZone then return end
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
     if not isBusy then
+        currentCops = exports.qbx_core:GetDutyCountType('leo')
         if currentCops >= config.minPacificPolice then
             if not pacificConfig.isOpened then
                 local hasItem = HasItem({'trojan_usb', 'electronickit'})
