@@ -1,5 +1,6 @@
 return {
     useTarget = false,
+    debugPoly = false,
 
     fingerprintChance = 50, -- Chance of dropping a fingerprint if not wearing gloves
 

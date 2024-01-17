@@ -2,6 +2,7 @@ local config = require 'config.server'
 local sharedConfig = require 'config.shared'
 local robberyBusy = false
 local timeOut = false
+local currentCops = 0
 local ITEMS =  exports.ox_inventory:Items()
 
 --- This will convert a table's keys into an array
@@ -412,6 +413,10 @@ RegisterNetEvent('thermite:StopFires', function()
     TriggerClientEvent('thermite:StopFires', -1)
 end)
 
+RegisterNetEvent('qbx_bankrobbery:server:setCopCount', function(amount)
+    currentCops = amount
+end)
+
 -- Callbacks
 lib.callback.register('qb-bankrobbery:server:isRobberyActive', function()
     return robberyBusy
@@ -430,6 +435,10 @@ lib.callback.register('thermite:server:check', function(source)
     else
         return false
     end
+end)
+
+lib.callback.register('qbx_bankrobbery:server:getCurrentCopCount', function()
+    return currentCops
 end)
 
 -- Items

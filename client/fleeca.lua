@@ -1,7 +1,7 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
-currentThermiteGate = 0
-CurrentCops = 0
+--currentThermiteGate = 0
+local currentCops = 0
 local closestBank = 0
 local inElectronickitZone = false
 local copsCalled = false
@@ -19,13 +19,13 @@ end
 
 RegisterNetEvent('electronickit:UseElectronickit', function()
     DropFingerprint()
-
+    currentCops = lib.callback.await('qbx_bankrobbery:server:getCurrentCopCount')
     if closestBank == 0 or not inElectronickitZone then return end
 
     local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
     if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
 
-    if CurrentCops < config.minFleecaPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error') end
+    if currentCops < config.minFleecaPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error') end
     if sharedConfig.smallBanks[closestBank].isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
 
     local hasItems = (exports.ox_inventory:Search('count', 'trojan_usb') > 0) and (exports.ox_inventory:Search('count', 'electronickit') > 0)
@@ -131,7 +131,13 @@ CreateThread(function()
             coords = sharedConfig.smallBanks[i].coords,
             size = vec3(1, 1, 2),
             rotation = sharedConfig.smallBanks[i].coords.closed,
-            debug = false
+            debug = config.debugPoly,
+            onEnter = function()
+                inElectronickitZone = true
+            end,
+            onExit = function()
+                inElectronickitZone = false
+            end,
         })
         for k in pairs(sharedConfig.smallBanks[i].lockers) do
             if config.useTarget then
@@ -139,7 +145,7 @@ CreateThread(function()
                     coords = sharedConfig.smallBanks[i].lockers[k].coords,
                     size = vec3(1, 1, 2),
                     rotation = sharedConfig.smallBanks[i].heading.closed,
-                    debug = false,
+                    debug = config.debugPoly,
                     drawSprite = true,
                     options = {
                         {
@@ -162,7 +168,7 @@ CreateThread(function()
                     coords = sharedConfig.smallBanks[i].lockers[k].coords,
                     size = vec3(1, 1, 2),
                     rotation = sharedConfig.smallBanks[i].heading.closed,
-                    debug = false,
+                    debug = config.debugPoly,
                     onEnter = function()
                         if closestBank ~= 0 and not isDrilling and sharedConfig.smallBanks[i].isOpened and not sharedConfig.smallBanks[i].lockers[k].isOpened and not sharedConfig.smallBanks[i].lockers[k].isBusy then
                             lib.showTextUI(Lang:t('general.break_safe_open_option_drawtext'), {position = 'right-center'})
@@ -189,7 +195,7 @@ CreateThread(function()
                         if IsControlJustPressed(0, 38) then
                             lib.hideTextUI()
                             Wait(500)
-                            if CurrentCops >= config.minFleecaPolice then
+                            if currentCops >= config.minFleecaPolice then
                                 OpenLocker(closestBank, currentLocker)
                             else
                                 exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error')
