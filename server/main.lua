@@ -201,19 +201,13 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                     local itemAmount = math.random(item.minAmount, item.maxAmount))
                     exports.ox_inventory:AddItem(src, item.item, itemAmount)
                 elseif config.rewardTypes[itemType].type == 'money' then
-                    local info = {
-                        worth = math.random(2300, 3200)
-                    }
-                    player.Functions.AddItem('markedbills', math.random(2,3), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
+                    exports.ox_inventory:AddItem(src, 'black_money', math.random(20000, 30000))
                 end
             else
-                player.Functions.AddItem('security_card_01', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['security_card_01'], 'add')
+                exports.ox_inventory:AddItem(src, 'security_card_01', 1)
             end
         else
-            player.Functions.AddItem('weapon_stungun', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_stungun'], 'add')
+            exports.ox_inventory:AddItem(src, 'weapon_stungun', 1)
         end
     elseif type == 'paleto' then
         if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.paleto.lockers[lockerId].coords) > 2.5 then
@@ -233,19 +227,13 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                     player.Functions.AddItem(item.item, itemAmount)
                     TriggerClientEvent('inventory:client:ItemBox', src,ITEMS[item.item], 'add')
                  elseif config.rewardTypes[itemType].type == 'money' then
-                    local info = {
-                        worth = math.random(4000, 6000)
-                    }
-                    player.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
+                    exports.ox_inventory:AddItem(src, 'black_money', math.random(10000, 40000))
                  end
             else
-                player.Functions.AddItem('security_card_02', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['security_card_02'], 'add')
+                exports.ox_inventory:AddItem(src, 'security_card_02', 1)
             end
         else
-            player.Functions.AddItem('weapon_vintagepistol', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_vintagepistol'], 'add')
+            exports.ox_inventory:AddItem(src, 'weapon_vintagepistol', 1)
         end
     elseif type == 'pacific' then
         if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.pacific.lockers[lockerId].coords) > 2.5 then
@@ -268,33 +256,19 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                     player.Functions.AddItem(item.item, itemAmount)
                     TriggerClientEvent('inventory:client:ItemBox', src,ITEMS[item.item], 'add')
                 elseif config.rewardTypes[itemType].type == 'money' then
-                    local info = {
-                        worth = math.random(19000, 21000)
-                    }
-                    player.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
+                    exports.ox_inventory:AddItem(src, 'black_money', math.random(10000, 40000))
                 end
             else
-                local info = {
-                    worth = math.random(19000, 21000)
-                }
-                player.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
-                info = {
-                    crypto = math.random(1, 3)
-                }
-                player.Functions.AddItem('cryptostick', 1, false, info)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['cryptostick'], 'add')
+                exports.ox_inventory:AddItem(src, 'black_money', math.random(10000, 40000))
+                exports.ox_inventory:AddItem(src, 'cryptostick', 1)
             end
         else
             local chance = math.random(1, 2)
             local odd = math.random(1, 2)
             if chance == odd then
-                player.Functions.AddItem('weapon_microsmg', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_microsmg'], 'add')
+                exports.ox_inventory:AddItem(src, 'weapon_microsmg', 1)
             else
-                player.Functions.AddItem('weapon_minismg', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_minismg'], 'add')
+                exports.ox_inventory:AddItem(src, 'weapon_minismg', 1)
             end
         end
     end
