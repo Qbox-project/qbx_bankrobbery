@@ -260,7 +260,6 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                 end
             else
                 exports.ox_inventory:AddItem(src, 'black_money', math.random(10000, 40000))
-                exports.ox_inventory:AddItem(src, 'cryptostick', 1)
             end
         else
             local chance = math.random(1, 2)
