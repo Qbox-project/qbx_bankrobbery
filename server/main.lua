@@ -198,9 +198,8 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
             if tier ~= 4 then
                 if config.rewardTypes[itemType].type == 'item' then
                     local item = config.lockerRewards['tier'..tier][math.random(#config.lockerRewards['tier'..tier])]
-                    local itemAmount = math.random(item.minAmount, item.maxAmount)
-                    player.Functions.AddItem(item.item, itemAmount)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS[item.item], 'add')
+                    local itemAmount = math.random(item.minAmount, item.maxAmount))
+                    exports.ox_inventory:AddItem(src, item.item, itemAmount)
                 elseif config.rewardTypes[itemType].type == 'money' then
                     local info = {
                         worth = math.random(2300, 3200)
