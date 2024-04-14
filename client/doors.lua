@@ -64,7 +64,7 @@ function OpenPaletoDoor()
     end
 end
 
-RegisterNetEvent('qb-bankrobbery:client:ClearTimeoutDoors', function()
+RegisterNetEvent('qbx_bankrobbery:client:ClearTimeoutDoors', function()
     --Config.DoorlockAction(4, true)
     local paletoObject = GetClosestObjectOfType(sharedConfig.bigBanks.paleto.coords.x, sharedConfig.bigBanks.paleto.coords.y, sharedConfig.bigBanks.paleto.coords.z, 5.0, sharedConfig.bigBanks.paleto.object, false, false, false)
     if paletoObject ~= 0 then

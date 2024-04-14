@@ -7,6 +7,8 @@ version '1.0.0'
 
 ui_page 'html/index.html'
 
+ox_lib 'locale'
+
 shared_scripts {
     '@ox_lib/init.lua',
     '@qbx_core/modules/utils.lua',
@@ -33,6 +35,7 @@ files {
     'config/client.lua',
     'config/shared.lua',
     'html/*',
+    'locales/*.json',
 }
 
 lua54 'yes'

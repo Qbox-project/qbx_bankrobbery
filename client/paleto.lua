@@ -4,20 +4,20 @@ local inBankCardAZone = false
 local currentLocker = 0
 local copsCalled = false
 
-RegisterNetEvent('qb-bankrobbery:UseBankcardA', function()
+RegisterNetEvent('qbx_bankrobbery:UseBankcardA', function()
     DropFingerprint()
 
     if not inBankCardAZone then return end
 
-    local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
-    if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
+    local isBusy = lib.callback.await('qbx_bankrobbery:server:isRobberyActive', false)
+    if isBusy then return exports.qbx_core:Notify(locale('error.security_lock_active'), 'error', 5500) end
 
-    if CurrentCops < config.minPaletoPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error') end
-    if paletoConfig.isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
+    if CurrentCops < config.minPaletoPolice then return exports.qbx_core:Notify(locale('error.minimum_police_required', {police = config.minPaletoPolice}), 'error') end
+    if paletoConfig.isOpened then return exports.qbx_core:Notify(locale('error.bank_already_open'), 'error') end
 
     if lib.progressBar({
         duration = 7500,
-        label = Lang:t('general.validating_bankcard'),
+        label = locale('general.validating_bankcard'),
         canCancel = true,
         useWhileDead = false,
         disable = {
@@ -32,14 +32,14 @@ RegisterNetEvent('qb-bankrobbery:UseBankcardA', function()
             flag = 1
         }
     }) then -- if completed
-        TriggerServerEvent('qb-bankrobbery:server:setBankState', 'paleto')
-        TriggerServerEvent('qb-bankrobbery:server:removeBankCard', '01')
+        TriggerServerEvent('qbx_bankrobbery:server:setBankState', 'paleto')
+        TriggerServerEvent('qbx_bankrobbery:server:removeBankCard', '01')
 
         if copsCalled or not paletoConfig.alarm then return end
-        TriggerServerEvent('qb-bankrobbery:server:callCops', 'paleto', 0, paletoConfig.coords)
+        TriggerServerEvent('qbx_bankrobbery:server:callCops', 'paleto', 0, paletoConfig.coords)
         copsCalled = true
     else -- if canceled
-        exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
+        exports.qbx_core:Notify(locale('error.cancel_message'), 'error')
     end
 end)
 
@@ -62,17 +62,11 @@ CreateThread(function()
         onEnter = function()
             if not paletoConfig.thermite[1].isOpened then
                 currentThermiteGate = paletoConfig.thermite[1].doorId
-                -- Config.ShowRequiredItems({
-                --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
-                -- }, true)
             end
         end,
         onExit = function()
             if currentThermiteGate == paletoConfig.thermite[1].doorId then
                 currentThermiteGate = 0
-                -- Config.ShowRequiredItems({
-                --     [1] = {name = exports.ox_inventory:Items().thermite.name, image = exports.ox_inventory:Items().thermite.image},
-                -- }, false)
             end
         end,
     })
@@ -86,7 +80,7 @@ CreateThread(function()
                 drawSprite = true,
                 options = {
                     {
-                        label = Lang:t('general.break_safe_open_option_target'),
+                        label = locale('general.break_safe_open_option_target'),
                         name = 'paleto_coords_locker_'..k,
                         icon = 'fa-solid fa-vault',
                         distance = 1.5,
@@ -108,7 +102,7 @@ CreateThread(function()
                 debug = false,
                 onEnter = function()
                     if not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened then
-                        lib.showTextUI(Lang:t('general.break_safe_open_option_drawtext'), {position = 'right-center'})
+                        lib.showTextUI(locale('general.break_safe_open_option_drawtext'), {position = 'right-center'})
                         currentLocker = k
                     end
                 end,
@@ -134,7 +128,7 @@ CreateThread(function()
                         if CurrentCops >= config.minPaletoPolice then
                             OpenLocker('paleto', currentLocker)
                         else
-                            exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minPaletoPolice}), 'error')
+                            exports.qbx_core:Notify(locale('error.minimum_police_required', {police = config.minPaletoPolice}), 'error')
                         end
                         sleep = 1000
                     end

@@ -106,7 +106,7 @@ $(document).ready(function() {
         if (distance < HitDistance) {
             // if (unghi > MainAngle - 25 && unghi < MainAngle + 25) {
             MainDigits--;
-            $.post("https://qb-bankrobbery/thermiteclick");
+            $.post("https://qbx_bankrobbery/thermiteclick");
             // If game over, hide the game, display end of game options
             if (!MainDigits) {
                 $("#circle").addClass("hidden");
@@ -209,5 +209,5 @@ Thermite.Success = function() {
 
 Thermite.Close = function() {
     $('.thermite-container').css("display", "none");
-    $.post('https://qb-bankrobbery/closethermite');
+    $.post('https://qbx_bankrobbery/closethermite');
 }
