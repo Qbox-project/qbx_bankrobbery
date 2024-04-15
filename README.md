@@ -1,2 +1,2 @@
 # qbx_bankrobbery
-Bank Robbery For QB-Core
+Bank Robbery For QBOX
