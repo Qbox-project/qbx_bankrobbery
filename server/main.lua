@@ -352,18 +352,15 @@ RegisterNetEvent('qbx_bankrobbery:server:removeElectronicKit', function()
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
-    player.Functions.RemoveItem('electronickit', 1)
-    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['electronickit'], 'remove')
-    player.Functions.RemoveItem('trojan_usb', 1)
-    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['trojan_usb'], 'remove')
+    exports.ox_inventory:RemoveItem(src, 'electronickit', 1)
+    exports.ox_inventory:RemoveItem(src, 'trojan_usb', 1)
 end)
 
 RegisterNetEvent('qbx_bankrobbery:server:removeBankCard', function(number)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
-    player.Functions.RemoveItem('security_card_'..number, 1)
-    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['security_card_'..number], 'remove')
+    exports.ox_inventory:RemoveItem(src, 'security_card_'..number, 1)
 end)
 
 RegisterNetEvent('thermite:StartServerFire', function(coords, maxChildren, isGasFire)
@@ -376,6 +373,10 @@ RegisterNetEvent('thermite:StartServerFire', function(coords, maxChildren, isGas
     if #(coords2 - thermiteCoords) < 10 or #(coords2 - thermite2Coords) < 10 or #(coords2 - thermite3Coords) < 10 or isNearPowerStation(coords2, 10) then
         TriggerClientEvent('thermite:StartFire', -1, coords, maxChildren, isGasFire)
     end
+end)
+
+RegisterNetEvent('qbx_bankrobbery:server:OpenGate', function(currentGate, state)
+    exports.ox_doorlock:setDoorState(currentGate, state)
 end)
 
 RegisterNetEvent('thermite:StopFires', function()
@@ -394,8 +395,7 @@ end)
 lib.callback.register('thermite:server:check', function(source)
     local player = exports.qbx_core:GetPlayer(source)
     if not player then return false end
-    if player.Functions.RemoveItem('thermite', 1) then
-        TriggerClientEvent('inventory:client:ItemBox', source,ITEMS['thermite'], 'remove')
+    if exports.ox_inventory:RemoveItem(src, 'thermite', 1) then
         return true
     else
         return false

@@ -1,6 +1,6 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
-currentThermiteGate = 0
+CurrentThermiteGate = 0
 CurrentCops = 0
 local closestBank = 0
 local inElectronickitZone = false
@@ -50,7 +50,7 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
     }) then
         TriggerServerEvent('qbx_bankrobbery:server:removeElectronicKit')
         TriggerEvent('mhacking:show')
-        TriggerEvent('mhacking:start', math.random(6, 7), math.random(12, 15), onHackDone)
+        TriggerEvent('mhacking:start', math.random(6, 7), math.random(15, 30), onHackDone)
         if copsCalled or not sharedConfig.smallBanks[closestBank].alarm then return end
         TriggerServerEvent('qbx_bankrobbery:server:callCops', 'small', closestBank, sharedConfig.smallBanks[closestBank].coords)
         copsCalled = true
@@ -131,7 +131,13 @@ CreateThread(function()
             coords = sharedConfig.smallBanks[i].coords,
             size = vec3(1, 1, 2),
             rotation = sharedConfig.smallBanks[i].coords.closed,
-            debug = false
+            debug = config.debugPoly,
+            onEnter = function()
+                inElectronickitZone = true
+            end,
+            onExit = function()
+                inElectronickitZone = false
+            end,
         })
         for k in pairs(sharedConfig.smallBanks[i].lockers) do
             if config.useTarget then
@@ -139,7 +145,7 @@ CreateThread(function()
                     coords = sharedConfig.smallBanks[i].lockers[k].coords,
                     size = vec3(1, 1, 2),
                     rotation = sharedConfig.smallBanks[i].heading.closed,
-                    debug = false,
+                    debug = config.debugPoly,
                     drawSprite = true,
                     options = {
                         {
@@ -162,7 +168,7 @@ CreateThread(function()
                     coords = sharedConfig.smallBanks[i].lockers[k].coords,
                     size = vec3(1, 1, 2),
                     rotation = sharedConfig.smallBanks[i].heading.closed,
-                    debug = false,
+                    debug = config.debugPoly,
                     onEnter = function()
                         if closestBank ~= 0 and not isDrilling and sharedConfig.smallBanks[i].isOpened and not sharedConfig.smallBanks[i].lockers[k].isOpened and not sharedConfig.smallBanks[i].lockers[k].isBusy then
                             lib.showTextUI(locale('general.break_safe_open_option_drawtext'), {position = 'right-center'})

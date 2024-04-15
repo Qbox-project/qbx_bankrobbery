@@ -24,7 +24,7 @@
         "pacific_robbery_alert": "Pacific Standard Bank robbery attempt",
         "break_safe_open_option_target": "Break Safe Open",
         "break_safe_open_option_drawtext": "[E] Break open the safe",
-        "validating_bankcard": "Validating Card...",
+        "validating_bankcard": "Validating card...",
         "thermite_detonating_in_seconds": "Thermite is going off in %{time} second(s)",
         "bank_robbery_police_call": "10-90: Bank Robbery"
     }

@@ -4,7 +4,7 @@ isLoggedIn = LocalPlayer.state.isLoggedIn
 isDrilling = false
 
 function DropFingerprint()
-    if IsWearingGloves() then return end
+    if qbx.isWearingGloves() then return end
     if config.fingerprintChance > math.random(0, 100) then
         local coords = GetEntityCoords(cache.ped)
         TriggerServerEvent('evidence:server:CreateFingerDrop', coords)
@@ -69,7 +69,7 @@ function OpenLocker(bankId, lockerId) -- Globally Used
             AttachEntityToEntity(drillObject, cache.ped, GetPedBoneIndex(cache.ped, 57005), 0.14, 0, -0.01, 90.0, -90.0, 180.0, true, true, false, true, 1, true)
             isDrilling = true
             if lib.progressBar({
-                duration = 25000,
+                duration = 20000,
                 label = locale('general.breaking_open_safe'),
                 canCancel = true,
                 useWhileDead = false,
@@ -114,7 +114,7 @@ function OpenLocker(bankId, lockerId) -- Globally Used
             AttachEntityToEntity(drillObject, cache.ped, GetPedBoneIndex(cache.ped, 57005), 0.14, 0, -0.01, 90.0, -90.0, 180.0, true, true, false, true, 1, true)
             isDrilling = true
             if lib.progressBar({
-                duration = 25000,
+                duration = 20000,
                 label = locale('general.breaking_open_safe'),
                 canCancel = true,
                 useWhileDead = false,
@@ -156,7 +156,7 @@ function OpenLocker(bankId, lockerId) -- Globally Used
     else
         isDrilling = true
         if lib.progressBar({
-            duration = 32000,
+            duration = 20000,
             label = locale('general.breaking_open_safe'),
             canCancel = true,
             useWhileDead = false,

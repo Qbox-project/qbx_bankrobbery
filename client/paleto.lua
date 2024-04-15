@@ -51,22 +51,28 @@ CreateThread(function()
         coords = paletoConfig.coords,
         size = vec3(1, 1, 2),
         rotation = paletoConfig.heading.closed,
-        debug = false,
+        debug = config.debugPoly,
+        onEnter = function()
+            inBankCardAZone = true
+        end,
+        onExit = function()
+            inBankCardAZone = false
+        end
     })
     lib.zones.box({
         name = 'paleto_coords_thermite_1',
         coords = paletoConfig.thermite[1].coords,
         size = vec3(1, 1, 2),
         rotation = paletoConfig.heading.closed,
-        debug = false,
+        debug = config.debugPoly,
         onEnter = function()
             if not paletoConfig.thermite[1].isOpened then
-                currentThermiteGate = paletoConfig.thermite[1].doorId
+                CurrentThermiteGate = paletoConfig.thermite[1].doorId
             end
         end,
         onExit = function()
-            if currentThermiteGate == paletoConfig.thermite[1].doorId then
-                currentThermiteGate = 0
+            if CurrentThermiteGate == paletoConfig.thermite[1].doorId then
+                CurrentThermiteGate = 0
             end
         end,
     })
@@ -76,7 +82,7 @@ CreateThread(function()
                 coords = paletoConfig.lockers[k].coords,
                 size = vec3(1, 1, 2),
                 rotationg = paletoConfig.heading.closed,
-                debug = false,
+                debug = config.debugPoly,
                 drawSprite = true,
                 options = {
                     {
@@ -87,7 +93,7 @@ CreateThread(function()
                         canInteract = function()
                             return not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened
                         end,
-                        onSlect = function()
+                        onSelect = function()
                             OpenLocker('paleto', k)
                         end,
                     },
@@ -99,7 +105,7 @@ CreateThread(function()
                 coords = paletoConfig.lockers[k].coords,
                 size = vec3(1, 1, 2),
                 rotation = paletoConfig.heading.closed,
-                debug = false,
+                debug = config.debugPoly,
                 onEnter = function()
                     if not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[k].isBusy and not paletoConfig.lockers[k].isopened then
                         lib.showTextUI(locale('general.break_safe_open_option_drawtext'), {position = 'right-center'})
@@ -122,9 +128,8 @@ CreateThread(function()
                 if currentLocker ~= 0 and not isDrilling and paletoConfig.isOpened and not paletoConfig.lockers[currentLocker].isBusy and not paletoConfig.lockers[currentLocker].isOpened then
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
-                        exports.qbx_core:KeyPressed()
-                        Wait(500)
                         lib.hideTextUI()
+                        Wait(500)
                         if CurrentCops >= config.minPaletoPolice then
                             OpenLocker('paleto', currentLocker)
                         else

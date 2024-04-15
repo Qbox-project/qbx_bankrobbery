@@ -39,7 +39,7 @@ end)
 RegisterNetEvent('thermite:UseThermite', function()
     local pos = GetEntityCoords(cache.ped)
     if closestStation ~= 0 then
-        if math.random(1, 100) > 85 or IsWearingGloves() then return end
+        if math.random(1, 100) > 85 or qbx.isWearingGloves() then return end
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         local dist = #(pos - powerStationConfig[closestStation].coords)
         if dist < 1.5 then
@@ -60,11 +60,11 @@ RegisterNetEvent('thermite:UseThermite', function()
                 exports.qbx_core:Notify(locale('error.minium_police_required', {police = config.minThermitePolice}), 'error')
             end
         end
-    elseif currentThermiteGate ~= 0 then
-        if math.random(1, 100) > 85 or IsWearingGloves() then return end
+    elseif CurrentThermiteGate ~= 0 then
+        if math.random(1, 100) > 85 or qbx.isWearingGloves() then return end
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         if CurrentCops >= config.minThermitePolice then
-            currentGate = currentThermiteGate
+            currentGate = CurrentThermiteGate
             lib.requestAnimDict('weapon@w_sp_jerrycan')
             TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, -1, 49, 0, false, false, false)
             SetNuiFocus(true, true)
@@ -72,6 +72,7 @@ RegisterNetEvent('thermite:UseThermite', function()
                 action = 'openThermite',
                 amount = math.random(5, 10),
             })
+            TriggerServerEvent('qbx_bankrobbery:server:OpenGate', currentGate, false)
         else
             exports.qbx_core:Notify(locale('error.minium_police_required', {police = config.minThermitePolice}), 'error')
         end
@@ -136,7 +137,7 @@ CreateThread(function()
             coords = powerStationConfig[k].coords,
             size = vec3(1, 1, 2),
             rotation = 75.0,
-            debug = false,
+            debug = config.debugPoly,
             onEnter = function()
                 if not powerStationConfig[k].hit then
                     closestStation = k

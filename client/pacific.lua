@@ -26,7 +26,7 @@ RegisterNetEvent('qbx_bankrobbery:UseBankcardB', function()
     if pacificConfig.isOpened then return exports.qbx_core:Notify(locale('error.bank_already_open'), 'error') end
 
     if lib.progressBar({
-        duration = 75000,
+        duration = 7500,
         label = locale('general.validating_bankcard'),
         canCancel = true,
         useWhileDead = false,
@@ -43,6 +43,7 @@ RegisterNetEvent('qbx_bankrobbery:UseBankcardB', function()
         }
     }) then
         TriggerServerEvent('qbx_bankrobbery:server:removeBankCard', '02')
+        TriggerServerEvent('qbx_bankrobbery:server:OpenGate', 6, false)
         if copsCalled or not pacificConfig.alarm then return end
         TriggerServerEvent('qbx_bankrobbery:server:callCops', 'pacific', 0, pacificConfig.coords)
         copsCalled = true
@@ -58,11 +59,11 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
     if not isBusy then
         if CurrentCops >= config.minPacificPolice then
             if not pacificConfig.isOpened then
-                local hasItem = HasItem({'trojan_usb', 'electronickit'})
-                if hasItem then
+                local hasItems = (exports.ox_inventory:Search('count', 'trojan_usb') > 0) and (exports.ox_inventory:Search('count', 'electronickit') > 0)
+                if hasItems then
                     if lib.progressBar({
                         duration = 7500,
-                        label = locale('general.breaking_open_safe'),
+                        label = locale('general.connecting_hacking_device'),
                         canCancel = true,
                         useWhileDead = false,
                         disable = {
@@ -77,9 +78,8 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
                             flag = 1
                         }
                     }) then
-                        StopAnimTask(cache.ped, 'anim@gangops@facility@servers@', 'hotwire', 1.0)
                         TriggerEvent('mhacking:show')
-                        TriggerEvent('mhacking:start', math.random(5, 9), math.random(10, 15), onHackPacificDone)
+                        TriggerEvent('mhacking:start', math.random(5, 9), math.random(15, 30), onHackPacificDone)
                         if copsCalled or not pacificConfig.alarm then return end
                         TriggerServerEvent('qbx_bankrobbery:server:callCops', 'pacific', 0, pos)
                         copsCalled = true
@@ -108,29 +108,41 @@ CreateThread(function()
         coords = pacificConfig.coords[1],
         size = vec3(1, 1, 2),
         rotation = pacificConfig.heading.closed,
-        debug = false,
+        debug = config.debugPoly,
+        onEnter = function()
+            inBankCardBZone = true
+        end,
+        onExit = function()
+            inBankCardBZone = false
+        end
     })
     lib.zones.box({
         name = 'pacific_coords_electronickit',
         coords = pacificConfig.coords[2],
         size = vec3(1, 1, 2),
         rotation = pacificConfig.heading.closed,
-        debug = false,
+        debug = config.debugPoly,
+        onEnter = function()
+            inElectronickitZone = true
+        end,
+        onExit = function()
+            inElectronickitZone = false
+        end
     })
     lib.zones.box({
         name = 'pacific_coords_thermite_1',
         coords = pacificConfig.thermite[1].coords,
         size = vec3(1, 1, 2),
         rotation = pacificConfig.heading.closed,
-        debug = false,
+        debug = config.debugPoly,
         onEnter = function()
             if not pacificConfig.thermite[1].isOpened then
-                currentThermiteGate = pacificConfig.thermite[1].doorId
+                CurrentThermiteGate = pacificConfig.thermite[1].doorId
             end
         end,
         onExit = function()
-            if currentThermiteGate == pacificConfig.thermite[1].doorId then
-                currentThermiteGate = 0
+            if CurrentThermiteGate == pacificConfig.thermite[1].doorId then
+                CurrentThermiteGate = 0
             end
         end,
     })
@@ -139,15 +151,15 @@ CreateThread(function()
         coords = pacificConfig.thermite[2].coords,
         size = vec3(1, 1, 2),
         rotation = pacificConfig.heading.closed,
-        debug = false,
+        debug = config.debugPoly,
         onEnter = function()
             if not pacificConfig.thermite[2].isOpened then
-                currentThermiteGate = pacificConfig.thermite[2].doorId
+                CurrentThermiteGate = pacificConfig.thermite[2].doorId
             end
         end,
         onExit = function()
-            if currentThermiteGate == pacificConfig.thermite[2].doorId then
-                currentThermiteGate = 0
+            if CurrentThermiteGate == pacificConfig.thermite[2].doorId then
+                CurrentThermiteGate = 0
             end
         end,
     })
@@ -157,7 +169,7 @@ CreateThread(function()
                 coords = pacificConfig.lockers[k].coords,
                 size = vec3(1, 1, 2),
                 rotation = pacificConfig.heading.closed,
-                debug = false,
+                debug = config.debugPoly,
                 drawSprite = true,
                 options = {
                     {
@@ -180,7 +192,7 @@ CreateThread(function()
                 coords = pacificConfig.lockers[k].coords,
                 size = vec3(1, 1, 2),
                 rotation = pacificConfig.heading.closed,
-                debug = false,
+                debug = config.debugPoly,
                 onEnter = function()
                     if not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[k].isBusy and not pacificConfig.lockers[k].isOpened then
                         lib.showTextUI(locale('general.break_safe_open_option_drawtext'), {position = 'right-center'})
@@ -203,9 +215,8 @@ CreateThread(function()
                 if currentLocker ~= 0 and not isDrilling and pacificConfig.isOpened and not pacificConfig.lockers[currentLocker].isBusy and not pacificConfig.lockers[currentLocker].isOpened then
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
-                        exports.qbx_core:KeyPressed()
-                        Wait(500)
                         lib.hideTextUI()
+                        Wait(500)
                         if CurrentCops >= config.minPacificPolice then
                             OpenLocker('pacific', currentLocker)
                         else
