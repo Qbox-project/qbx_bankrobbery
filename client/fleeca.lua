@@ -1,6 +1,6 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
-currentThermiteGate = 0
+CurrentThermiteGate = 0
 CurrentCops = 0
 local closestBank = 0
 local inElectronickitZone = false
@@ -14,7 +14,7 @@ local currentLocker = 0
 local function onHackDone(success)
     TriggerEvent('mhacking:hide')
     if not success then return end
-    TriggerServerEvent('qb-bankrobbery:server:setBankState', closestBank)
+    TriggerServerEvent('qbx_bankrobbery:server:setBankState', closestBank)
 end
 
 RegisterNetEvent('electronickit:UseElectronickit', function()
@@ -22,18 +22,18 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
 
     if closestBank == 0 or not inElectronickitZone then return end
 
-    local isBusy = lib.callback.await('qb-bankrobbery:server:isRobberyActive', false)
-    if isBusy then return exports.qbx_core:Notify(Lang:t('error.security_lock_active'), 'error', 5500) end
+    local isBusy = lib.callback.await('qbx_bankrobbery:server:isRobberyActive', false)
+    if isBusy then return exports.qbx_core:Notify(locale('error.security_lock_active'), 'error', 5500) end
 
-    if CurrentCops < config.minFleecaPolice then return exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error') end
-    if sharedConfig.smallBanks[closestBank].isOpened then return exports.qbx_core:Notify(Lang:t('error.bank_already_open'), 'error') end
+    if CurrentCops < config.minFleecaPolice then return exports.qbx_core:Notify(locale('error.minimum_police_required', {police = config.minFleecaPolice}), 'error') end
+    if sharedConfig.smallBanks[closestBank].isOpened then return exports.qbx_core:Notify(locale('error.bank_already_open'), 'error') end
 
     local hasItems = (exports.ox_inventory:Search('count', 'trojan_usb') > 0) and (exports.ox_inventory:Search('count', 'electronickit') > 0)
-    if not hasItems then return exports.qbx_core:Notify(Lang:t('error.missing_item'), 'error') end
+    if not hasItems then return exports.qbx_core:Notify(locale('error.missing_item'), 'error') end
 
     if lib.progressBar({
         duration = 7500,
-        label = Lang:t('general.connecting_hacking_device'),
+        label = locale('general.connecting_hacking_device'),
         canCancel = true,
         useWhileDead = false,
         disable = {
@@ -48,31 +48,31 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
             flag = 1
         }
     }) then
-        TriggerServerEvent('qb-bankrobbery:server:removeElectronicKit')
+        TriggerServerEvent('qbx_bankrobbery:server:removeElectronicKit')
         TriggerEvent('mhacking:show')
-        TriggerEvent('mhacking:start', math.random(6, 7), math.random(12, 15), onHackDone)
+        TriggerEvent('mhacking:start', math.random(6, 7), math.random(15, 30), onHackDone)
         if copsCalled or not sharedConfig.smallBanks[closestBank].alarm then return end
-        TriggerServerEvent('qb-bankrobbery:server:callCops', 'small', closestBank, sharedConfig.smallBanks[closestBank].coords)
+        TriggerServerEvent('qbx_bankrobbery:server:callCops', 'small', closestBank, sharedConfig.smallBanks[closestBank].coords)
         copsCalled = true
         SetTimeout(60000 * config.outlawCooldown, function() copsCalled = false end)
     else
-        exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
+        exports.qbx_core:Notify(locale('error.cancel_message'), 'error')
     end
 end)
 
-RegisterNetEvent('qb-bankrobbery:client:enableAllBankSecurity', function()
+RegisterNetEvent('qbx_bankrobbery:client:enableAllBankSecurity', function()
     for k in pairs(sharedConfig.smallBanks) do
         sharedConfig.smallBanks[k].alarm = true
     end
 end)
 
-RegisterNetEvent('qb-bankrobbery:client:disableAllBankSecurity', function()
+RegisterNetEvent('qbx_bankrobbery:client:disableAllBankSecurity', function()
     for k in pairs(sharedConfig.smallBanks) do
         sharedConfig.smallBanks[k].alarm = false
     end
 end)
 
-RegisterNetEvent('qb-bankrobbery:client:BankSecurity', function(key, status)
+RegisterNetEvent('qbx_bankrobbery:client:BankSecurity', function(key, status)
     if type(key) == 'table' and table.type(key) == 'array' then
         for _, v in pairs(key) do
             sharedConfig.smallBanks[v].alarm = status
@@ -80,11 +80,11 @@ RegisterNetEvent('qb-bankrobbery:client:BankSecurity', function(key, status)
     elseif type(key) == 'number' then
         sharedConfig.smallBanks[key].alarm = status
     else
-        error(Lang:t('error.wrong_type', {receiver = 'qb-bankrobbery:client:BankSecurity', argument = 'key', receivedType = type(key), receivedValue = key, expected = 'table/array'}))
+        error(locale('error.wrong_type', {receiver = 'qbx_bankrobbery:client:BankSecurity', argument = 'key', receivedType = type(key), receivedValue = key, expected = 'table/array'}))
     end
 end)
 
-RegisterNetEvent('qb-bankrobbery:client:ResetFleecaLockers', function(BankId)
+RegisterNetEvent('qbx_bankrobbery:client:ResetFleecaLockers', function(BankId)
     sharedConfig.smallBanks[BankId].isOpened = false
     for k in pairs(sharedConfig.smallBanks[BankId].lockers) do
         sharedConfig.smallBanks[BankId].lockers[k].isOpened = false
@@ -131,7 +131,13 @@ CreateThread(function()
             coords = sharedConfig.smallBanks[i].coords,
             size = vec3(1, 1, 2),
             rotation = sharedConfig.smallBanks[i].coords.closed,
-            debug = false
+            debug = config.debugPoly,
+            onEnter = function()
+                inElectronickitZone = true
+            end,
+            onExit = function()
+                inElectronickitZone = false
+            end,
         })
         for k in pairs(sharedConfig.smallBanks[i].lockers) do
             if config.useTarget then
@@ -139,11 +145,11 @@ CreateThread(function()
                     coords = sharedConfig.smallBanks[i].lockers[k].coords,
                     size = vec3(1, 1, 2),
                     rotation = sharedConfig.smallBanks[i].heading.closed,
-                    debug = false,
+                    debug = config.debugPoly,
                     drawSprite = true,
                     options = {
                         {
-                            label = Lang:t('general.break_safe_open_option_target'),
+                            label = locale('general.break_safe_open_option_target'),
                             name = 'fleeca_'..i..'_coords_locker_'..k,
                             icon = 'fa-solid fa-vault',
                             distance = 1.5,
@@ -162,10 +168,10 @@ CreateThread(function()
                     coords = sharedConfig.smallBanks[i].lockers[k].coords,
                     size = vec3(1, 1, 2),
                     rotation = sharedConfig.smallBanks[i].heading.closed,
-                    debug = false,
+                    debug = config.debugPoly,
                     onEnter = function()
                         if closestBank ~= 0 and not isDrilling and sharedConfig.smallBanks[i].isOpened and not sharedConfig.smallBanks[i].lockers[k].isOpened and not sharedConfig.smallBanks[i].lockers[k].isBusy then
-                            lib.showTextUI(Lang:t('general.break_safe_open_option_drawtext'), {position = 'right-center'})
+                            lib.showTextUI(locale('general.break_safe_open_option_drawtext'), {position = 'right-center'})
                             currentLocker = k
                         end
                     end,
@@ -192,7 +198,7 @@ CreateThread(function()
                             if CurrentCops >= config.minFleecaPolice then
                                 OpenLocker(closestBank, currentLocker)
                             else
-                                exports.qbx_core:Notify(Lang:t('error.minimum_police_required', {police = config.minFleecaPolice}), 'error')
+                                exports.qbx_core:Notify(locale('error.minimum_police_required', {police = config.minFleecaPolice}), 'error')
                             end
                             sleep = 1000
                         end

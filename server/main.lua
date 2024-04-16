@@ -89,9 +89,9 @@ local function checkStationHits()
     bankHits = tableKeysToArray(bankHits)
 
     -- table.type checks if it's empty as well, if it's empty it will return the type 'empty' instead of 'array'
-    
+
     if table.type(policeHits) == 'array' then TriggerClientEvent('police:client:SetCamera', -1, policeHits, false) end
-    if table.type(bankHits) == 'array' then TriggerClientEvent('qb-bankrobbery:client:BankSecurity', -1, bankHits, false) end
+    if table.type(bankHits) == 'array' then TriggerClientEvent('qbx_bankrobbery:client:BankSecurity', -1, bankHits, false) end
 end
 
 --- This will do a quick check to see if all stations have been hit
@@ -134,28 +134,28 @@ local function changeBlackoutState(state)
     TriggerClientEvent(eventName, -1)
 end
 
-RegisterNetEvent('qb-bankrobbery:server:setBankState', function(bankId)
+RegisterNetEvent('qbx_bankrobbery:server:setBankState', function(bankId)
     if robberyBusy then return end
     if bankId == 'paleto' then
         if sharedConfig.bigBanks.paleto.isOpened or #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.paleto.coords) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:setBankState', extraInfo = ' (paleto) ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setBankState', extraInfo = ' (paleto) ', source = source}))
         end
         sharedConfig.bigBanks.paleto.isOpened = true
-        TriggerEvent('qb-bankrobbery:server:setTimeout')
+        TriggerEvent('qbx_bankrobbery:server:setTimeout')
     elseif bankId == 'pacific' then
         if sharedConfig.bigBanks.pacific.isOpened or #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.pacific.coords[2]) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:setBankState', extraInfo = ' (pacific) ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setBankState', extraInfo = ' (pacific) ', source = source}))
         end
         sharedConfig.bigBanks.pacific.isOpened = true
-        TriggerEvent('qb-bankrobbery:server:setTimeout')
+        TriggerEvent('qbx_bankrobbery:server:setTimeout')
     else
         if sharedConfig.smallBanks[bankId].isOpened or #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.smallBanks[bankId].coords) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:setBankState', extraInfo = ' (smallbank '..bankId..') ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setBankState', extraInfo = ' (smallbank '..bankId..') ', source = source}))
         end
         sharedConfig.smallBanks[bankId].isOpened = true
-        TriggerEvent('qb-bankrobbery:server:SetSmallBankTimeout', bankId)
+        TriggerEvent('qbx_bankrobbery:server:SetSmallBankTimeout', bankId)
     end
-    TriggerClientEvent('qb-bankrobbery:client:setBankState', -1, bankId)
+    TriggerClientEvent('qbx_bankrobbery:client:setBankState', -1, bankId)
     robberyBusy = true
 
     local bankName = type(bankId) == 'number' and 'bankrobbery' or bankId
@@ -165,28 +165,28 @@ RegisterNetEvent('qb-bankrobbery:server:setBankState', function(bankId)
     changeBankState(bankId, true)
 end)
 
-RegisterNetEvent('qb-bankrobbery:server:setLockerState', function(bankId, lockerId, state, bool)
+RegisterNetEvent('qbx_bankrobbery:server:setLockerState', function(bankId, lockerId, state, bool)
     if bankId == 'paleto' or bankId == 'pacific' then
         if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks[bankId].lockers[lockerId].coords) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:setLockerState', extraInfo = ' ('..bankId..') ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setLockerState', extraInfo = ' ('..bankId..') ', source = source}))
         end
         sharedConfig.bigBanks[bankId].lockers[lockerId][state] = bool
     else
         if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.smallBanks[bankId].lockers[lockerId].coords) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:setLockerState', extraInfo = ' (smallbank '..bankId..') ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setLockerState', extraInfo = ' (smallbank '..bankId..') ', source = source}))
         end
         sharedConfig.smallBanks[bankId].lockers[lockerId][state] = bool
     end
-    TriggerClientEvent('qb-bankrobbery:client:setLockerState', -1, bankId, lockerId, state, bool)
+    TriggerClientEvent('qbx_bankrobbery:client:setLockerState', -1, bankId, lockerId, state, bool)
 end)
 
-RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, lockerId)
+RegisterNetEvent('qbx_bankrobbery:server:recieveItem', function(type, bankId, lockerId)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
     if type == 'small' then
         if #(GetEntityCoords(GetPlayerPed(src)) - sharedConfig.smallBanks[bankId].lockers[lockerId].coords) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:receiveItem', extraInfo = ' (smallbank '..bankId..') ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:receiveItem', extraInfo = ' (smallbank '..bankId..') ', source = source}))
         end
         local itemType = math.random(#config.rewardTypes)
         local weaponChance = math.random(1, 50)
@@ -199,26 +199,19 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                 if config.rewardTypes[itemType].type == 'item' then
                     local item = config.lockerRewards['tier'..tier][math.random(#config.lockerRewards['tier'..tier])]
                     local itemAmount = math.random(item.minAmount, item.maxAmount)
-                    player.Functions.AddItem(item.item, itemAmount)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS[item.item], 'add')
+                    exports.ox_inventory:AddItem(src, item.item, itemAmount)
                 elseif config.rewardTypes[itemType].type == 'money' then
-                    local info = {
-                        worth = math.random(2300, 3200)
-                    }
-                    player.Functions.AddItem('markedbills', math.random(2,3), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
+                    exports.ox_inventory:AddItem(src, 'black_money', math.random(20000, 30000))
                 end
             else
-                player.Functions.AddItem('security_card_01', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['security_card_01'], 'add')
+                exports.ox_inventory:AddItem(src, 'security_card_01', 1)
             end
         else
-            player.Functions.AddItem('weapon_stungun', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_stungun'], 'add')
+            exports.ox_inventory:AddItem(src, 'weapon_stungun', 1)
         end
     elseif type == 'paleto' then
         if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.paleto.lockers[lockerId].coords) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:receiveItem', extraInfo = ' (paleto) ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:receiveItem', extraInfo = ' (paleto) ', source = source}))
         end
         local itemType = math.random(#config.rewardTypes)
         local tierChance = math.random(1, 100)
@@ -231,26 +224,19 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                  if config.rewardTypes[itemType].type == 'item' then
                     local item = config.lockerRewardsPaleto['tier'..tier][math.random(#config.lockerRewardsPaleto['tier'..tier])]
                     local itemAmount = math.random(item.minAmount, item.maxAmount)
-                    player.Functions.AddItem(item.item, itemAmount)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS[item.item], 'add')
+                    exports.ox_inventory:AddItem(src, item.item, itemAmount)
                  elseif config.rewardTypes[itemType].type == 'money' then
-                    local info = {
-                        worth = math.random(4000, 6000)
-                    }
-                    player.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
+                    exports.ox_inventory:AddItem(src, 'black_money', math.random(10000, 40000))
                  end
             else
-                player.Functions.AddItem('security_card_02', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['security_card_02'], 'add')
+                exports.ox_inventory:AddItem(src, 'security_card_02', 1)
             end
         else
-            player.Functions.AddItem('weapon_vintagepistol', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_vintagepistol'], 'add')
+            exports.ox_inventory:AddItem(src, 'weapon_vintagepistol', 1)
         end
     elseif type == 'pacific' then
         if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.pacific.lockers[lockerId].coords) > 2.5 then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:receiveItem', extraInfo = ' (pacific) ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:receiveItem', extraInfo = ' (pacific) ', source = source}))
         end
         local itemType = math.random(#config.rewardTypes)
         local weaponChance = math.random(1, 100)
@@ -266,42 +252,26 @@ RegisterNetEvent('qb-bankrobbery:server:recieveItem', function(type, bankId, loc
                     local maxAmount
                     if tier == 3 then maxAmount = 7 elseif tier == 2 then maxAmount = 18 else maxAmount = 25 end
                     local itemAmount = math.random(maxAmount)
-                    player.Functions.AddItem(item.item, itemAmount)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS[item.item], 'add')
+                    exports.ox_inventory:AddItem(src, item.item, itemAmount)
                 elseif config.rewardTypes[itemType].type == 'money' then
-                    local info = {
-                        worth = math.random(19000, 21000)
-                    }
-                    player.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
+                    exports.ox_inventory:AddItem(src, 'black_money', math.random(10000, 40000))
                 end
             else
-                local info = {
-                    worth = math.random(19000, 21000)
-                }
-                player.Functions.AddItem('markedbills', math.random(1,4), false, info)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['markedbills'], 'add')
-                info = {
-                    crypto = math.random(1, 3)
-                }
-                player.Functions.AddItem('cryptostick', 1, false, info)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['cryptostick'], 'add')
+                exports.ox_inventory:AddItem(src, 'black_money', math.random(10000, 40000))
             end
         else
             local chance = math.random(1, 2)
             local odd = math.random(1, 2)
             if chance == odd then
-                player.Functions.AddItem('weapon_microsmg', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_microsmg'], 'add')
+                exports.ox_inventory:AddItem(src, 'weapon_microsmg', 1)
             else
-                player.Functions.AddItem('weapon_minismg', 1)
-                TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['weapon_minismg'], 'add')
+                exports.ox_inventory:AddItem(src, 'weapon_minismg', 1)
             end
         end
     end
 end)
 
-AddEventHandler('qb-bankrobbery:server:setTimeout', function()
+AddEventHandler('qbx_bankrobbery:server:setTimeout', function()
     if robberyBusy or timeOut then return end
     timeOut = true
     CreateThread(function()
@@ -314,7 +284,7 @@ AddEventHandler('qb-bankrobbery:server:setTimeout', function()
                 sharedConfig.bigBanks.paleto.lockers[k].isBusy = false
                 sharedConfig.bigBanks.paleto.lockers[k].isOpened = false
             end
-            TriggerClientEvent('qb-bankrobbery:client:ClearTimeoutDoors', -1)
+            TriggerClientEvent('qbx_bankrobbery:client:ClearTimeoutDoors', -1)
             sharedConfig.bigBanks.paleto.isOpened = false
             sharedConfig.bigBanks.pacific.isOpened = false
             timeOut = false
@@ -325,7 +295,7 @@ AddEventHandler('qb-bankrobbery:server:setTimeout', function()
     end)
 end)
 
-AddEventHandler('qb-bankrobbery:server:SetSmallBankTimeout', function(bankId)
+AddEventHandler('qbx_bankrobbery:server:SetSmallBankTimeout', function(bankId)
     if robberyBusy or timeOut then return end
     timeOut = true
     CreateThread(function()
@@ -334,7 +304,7 @@ AddEventHandler('qb-bankrobbery:server:SetSmallBankTimeout', function(bankId)
                 sharedConfig.smallBanks[bankId].lockers[k].isOpened = false
                 sharedConfig.smallBanks[bankId].lockers[k].isBusy = false
             end
-            TriggerClientEvent('qb-bankrobbery:client:ResetFleecaLockers', -1, bankId)
+            TriggerClientEvent('qbx_bankrobbery:client:ResetFleecaLockers', -1, bankId)
             timeOut = false
             robberyBusy = false
             changeBankState(bankId, false)
@@ -342,34 +312,34 @@ AddEventHandler('qb-bankrobbery:server:SetSmallBankTimeout', function(bankId)
     end)
 end)
 
-RegisterNetEvent('qb-bankrobbery:server:callCops', function(type, bank, coords)
+RegisterNetEvent('qbx_bankrobbery:server:callCops', function(type, bank, coords)
     if type == 'small' then
         if not sharedConfig.smallBanks[bank].alarm then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:callCops', extraInfo = ' (smallbank '..bank..') ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:callCops', extraInfo = ' (smallbank '..bank..') ', source = source}))
         end
     elseif type == 'paleto' then
         if not sharedConfig.bigBanks.paleto.alarm then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:callCops', extraInfo = ' (paleto) ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:callCops', extraInfo = ' (paleto) ', source = source}))
         end
     elseif type == 'pacific' then
         if not sharedConfig.bigBanks.pacific.alarm then
-            return error(Lang:t('error.event_trigger_wrong', {event = 'qb-bankrobbery:server:callCops', extraInfo = ' (pacific) ', source = source}))
+            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:callCops', extraInfo = ' (pacific) ', source = source}))
         end
     end
-    TriggerClientEvent('qb-bankrobbery:client:robberyCall', -1, type, coords)
+    TriggerClientEvent('qbx_bankrobbery:client:robberyCall', -1, type, coords)
 end)
 
-RegisterNetEvent('qb-bankrobbery:server:SetStationStatus', function(key, isHit)
+RegisterNetEvent('qbx_bankrobbery:server:SetStationStatus', function(key, isHit)
     sharedConfig.powerStations[key].hit = isHit
-    TriggerClientEvent('qb-bankrobbery:client:SetStationStatus', -1, key, isHit)
+    TriggerClientEvent('qbx_bankrobbery:client:SetStationStatus', -1, key, isHit)
     if allStationsHit() then
         exports['qb-weathersync']:setBlackout(true)
-        TriggerClientEvent('qb-bankrobbery:client:disableAllBankSecurity', -1)
+        TriggerClientEvent('qbx_bankrobbery:client:disableAllBankSecurity', -1)
         changeBlackoutState(true)
         CreateThread(function()
             SetTimeout(60000 * config.blackoutTimer, function()
                 exports['qb-weathersync']:setBlackout(false)
-                TriggerClientEvent('qb-bankrobbery:client:enableAllBankSecurity', -1)
+                TriggerClientEvent('qbx_bankrobbery:client:enableAllBankSecurity', -1)
                 changeBlackoutState(false)
             end)
         end)
@@ -378,22 +348,19 @@ RegisterNetEvent('qb-bankrobbery:server:SetStationStatus', function(key, isHit)
     end
 end)
 
-RegisterNetEvent('qb-bankrobbery:server:removeElectronicKit', function()
+RegisterNetEvent('qbx_bankrobbery:server:removeElectronicKit', function()
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
-    player.Functions.RemoveItem('electronickit', 1)
-    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['electronickit'], 'remove')
-    player.Functions.RemoveItem('trojan_usb', 1)
-    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['trojan_usb'], 'remove')
+    exports.ox_inventory:RemoveItem(src, 'electronickit', 1)
+    exports.ox_inventory:RemoveItem(src, 'trojan_usb', 1)
 end)
 
-RegisterNetEvent('qb-bankrobbery:server:removeBankCard', function(number)
+RegisterNetEvent('qbx_bankrobbery:server:removeBankCard', function(number)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
-    player.Functions.RemoveItem('security_card_'..number, 1)
-    TriggerClientEvent('inventory:client:ItemBox', src,ITEMS['security_card_'..number], 'remove')
+    exports.ox_inventory:RemoveItem(src, 'security_card_'..number, 1)
 end)
 
 RegisterNetEvent('thermite:StartServerFire', function(coords, maxChildren, isGasFire)
@@ -408,24 +375,27 @@ RegisterNetEvent('thermite:StartServerFire', function(coords, maxChildren, isGas
     end
 end)
 
+RegisterNetEvent('qbx_bankrobbery:server:OpenGate', function(currentGate, state)
+    exports.ox_doorlock:setDoorState(currentGate, state)
+end)
+
 RegisterNetEvent('thermite:StopFires', function()
     TriggerClientEvent('thermite:StopFires', -1)
 end)
 
 -- Callbacks
-lib.callback.register('qb-bankrobbery:server:isRobberyActive', function()
+lib.callback.register('qbx_bankrobbery:server:isRobberyActive', function()
     return robberyBusy
 end)
 
-lib.callback.register('qb-bankrobbery:server:GetConfig', function()
+lib.callback.register('qbx_bankrobbery:server:GetConfig', function()
     return sharedConfig.powerStations, sharedConfig.bigBanks, sharedConfig.smallBanks
 end)
 
 lib.callback.register('thermite:server:check', function(source)
     local player = exports.qbx_core:GetPlayer(source)
     if not player then return false end
-    if player.Functions.RemoveItem('thermite', 1) then
-        TriggerClientEvent('inventory:client:ItemBox', source,ITEMS['thermite'], 'remove')
+    if exports.ox_inventory:RemoveItem(src, 'thermite', 1) then
         return true
     else
         return false
@@ -440,20 +410,20 @@ exports.qbx_core:CreateUseableItem('thermite', function(source)
 	if player.Functions.GetItemByName('lighter') then
         TriggerClientEvent('thermite:UseThermite', source)
     else
-        TriggerClientEvent('QBCore:Notify', source, Lang:t('error.missing_ignition_source'), 'error')
+        exports.qbx_core:Notify(source, locale('error.missing_ignition_source'), 'error')
     end
 end)
 
 exports.qbx_core:CreateUseableItem('security_card_01', function(source)
     local player = exports.qbx_core:GetPlayer(source)
 	if not player or not player.Functions.GetItemByName('security_card_01') then return end
-    TriggerClientEvent('qb-bankrobbery:UseBankcardA', source)
+    TriggerClientEvent('qbx_bankrobbery:UseBankcardA', source)
 end)
 
 exports.qbx_core:CreateUseableItem('security_card_02', function(source)
     local player = exports.qbx_core:GetPlayer(source)
 	if not player or not player.Functions.GetItemByName('security_card_02') then return end
-    TriggerClientEvent('qb-bankrobbery:UseBankcardB', source)
+    TriggerClientEvent('qbx_bankrobbery:UseBankcardB', source)
 end)
 
 exports.qbx_core:CreateUseableItem('electronickit', function(source)

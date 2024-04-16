@@ -39,7 +39,7 @@ end)
 RegisterNetEvent('thermite:UseThermite', function()
     local pos = GetEntityCoords(cache.ped)
     if closestStation ~= 0 then
-        if math.random(1, 100) > 85 or IsWearingGloves() then return end
+        if math.random(1, 100) > 85 or qbx.isWearingGloves() then return end
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         local dist = #(pos - powerStationConfig[closestStation].coords)
         if dist < 1.5 then
@@ -47,7 +47,6 @@ RegisterNetEvent('thermite:UseThermite', function()
                 if not powerStationConfig[closestStation].hit then
                     lib.requestAnimDict('weapon@w_sp_jerrycan')
                     TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, 180, 49, 0, false, false, false)
-                    -- Config.ShowRequiredItems(requiredItems, false)
                     SetNuiFocus(true, true)
                     SendNUIMessage({
                         action = 'openThermite',
@@ -55,32 +54,32 @@ RegisterNetEvent('thermite:UseThermite', function()
                     })
                     currentStation = closestStation
                 else
-                    exports.qbx_core:Notify(Lang:t('error.fuses_already_blown'), 'error')
+                    exports.qbx_core:Notify(locale('error.fuses_already_blown'), 'error')
                 end
             else
-                exports.qbx_core:Notify(Lang:t('error.minium_police_required', {police = config.minThermitePolice}), 'error')
+                exports.qbx_core:Notify(locale('error.minium_police_required', {police = config.minThermitePolice}), 'error')
             end
         end
-    elseif currentThermiteGate ~= 0 then
-        if math.random(1, 100) > 85 or IsWearingGloves() then return end
+    elseif CurrentThermiteGate ~= 0 then
+        if math.random(1, 100) > 85 or qbx.isWearingGloves() then return end
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         if CurrentCops >= config.minThermitePolice then
-            currentGate = currentThermiteGate
+            currentGate = CurrentThermiteGate
             lib.requestAnimDict('weapon@w_sp_jerrycan')
             TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, -1, 49, 0, false, false, false)
-            -- Config.ShowRequiredItems(requiredItems, false)
             SetNuiFocus(true, true)
             SendNUIMessage({
                 action = 'openThermite',
                 amount = math.random(5, 10),
             })
+            TriggerServerEvent('qbx_bankrobbery:server:OpenGate', currentGate, false)
         else
-            exports.qbx_core:Notify(Lang:t('error.minium_police_required', {police = config.minThermitePolice}), 'error')
+            exports.qbx_core:Notify(locale('error.minium_police_required', {police = config.minThermitePolice}), 'error')
         end
     end
 end)
 
-RegisterNetEvent('qb-bankrobbery:client:SetStationStatus', function(key, isHit)
+RegisterNetEvent('qbx_bankrobbery:client:SetStationStatus', function(key, isHit)
     powerStationConfig[key].hit = isHit
 end)
 
@@ -108,17 +107,17 @@ RegisterNUICallback('thermitesuccess', function(_, cb)
         local time = 3
         local coords = GetEntityCoords(cache.ped)
         while time > 0 do
-            exports.qbx_core:Notify(Lang:t('general.thermite_detonating_in_seconds', {time = time}))
+            exports.qbx_core:Notify(locale('general.thermite_detonating_in_seconds', {time = time}))
             Wait(1000)
             time -= 1
         end
         local randTime = math.random(10000, 15000)
         createFire(coords, randTime)
         if currentStation ~= 0 then
-            exports.qbx_core:Notify(Lang:t('success.fuses_are_blown'), 'success')
-            TriggerServerEvent('qb-bankrobbery:server:SetStationStatus', currentStation, true)
+            exports.qbx_core:Notify(locale('success.fuses_are_blown'), 'success')
+            TriggerServerEvent('qbx_bankrobbery:server:SetStationStatus', currentStation, true)
         elseif currentGate ~= 0 then
-            exports.qbx_core:Notify(Lang:t('success.door_has_opened'), 'success')
+            exports.qbx_core:Notify(locale('success.door_has_opened'), 'success')
             --Config.DoorlockAction(currentGate, false)
             currentGate = 0
         end
@@ -138,17 +137,15 @@ CreateThread(function()
             coords = powerStationConfig[k].coords,
             size = vec3(1, 1, 2),
             rotation = 75.0,
-            debug = false,
+            debug = config.debugPoly,
             onEnter = function()
                 if not powerStationConfig[k].hit then
                     closestStation = k
-                    -- Config.ShowRequiredItems(requiredItems, true)
                 end
             end,
             onExit = function()
                 if closestStation == k then
                     closestStation = 0
-                    -- Config.ShowRequiredItems(requiredItems, false)
                 end
             end,
         })

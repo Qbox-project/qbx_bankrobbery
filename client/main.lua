@@ -4,7 +4,7 @@ isLoggedIn = LocalPlayer.state.isLoggedIn
 isDrilling = false
 
 function DropFingerprint()
-    if IsWearingGloves() then return end
+    if qbx.isWearingGloves() then return end
     if config.fingerprintChance > math.random(0, 100) then
         local coords = GetEntityCoords(cache.ped)
         TriggerServerEvent('evidence:server:CreateFingerDrop', coords)
@@ -17,7 +17,7 @@ AddEventHandler('onResourceStop', function(resource)
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    local config1, config2, config3 = lib.callback.await('qb-bankrobbery:server:GetConfig', false)
+    local config1, config2, config3 = lib.callback.await('qbx_bankrobbery:server:GetConfig', false)
     sharedConfig.powerStations = config1
     sharedConfig.bigBanks = config2
     sharedConfig.smallBanks = config3
@@ -29,7 +29,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     isLoggedIn = false
 end)
 
-RegisterNetEvent('qb-bankrobbery:client:setBankState', function(bankId)
+RegisterNetEvent('qbx_bankrobbery:client:setBankState', function(bankId)
     if bankId == 'paleto' then
         sharedConfig.bigBanks.paleto.isOpened = true
         OpenPaletoDoor()
@@ -42,7 +42,7 @@ RegisterNetEvent('qb-bankrobbery:client:setBankState', function(bankId)
     end
 end)
 
-RegisterNetEvent('qb-bankrobbery:client:setLockerState', function(bankId, lockerId, state, bool)
+RegisterNetEvent('qbx_bankrobbery:client:setLockerState', function(bankId, lockerId, state, bool)
     if bankId == 'paleto' then
         sharedConfig.bigBanks.paleto.lockers[lockerId][state] = bool
     elseif bankId == 'pacific' then
@@ -59,7 +59,7 @@ end)
 function OpenLocker(bankId, lockerId) -- Globally Used
     local pos = GetEntityCoords(cache.ped)
     DropFingerprint()
-    TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', true)
+    TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', true)
     if bankId == 'paleto' then
         local hasItem = exports.ox_inventory:Search('count', 'drill') > 0
         if hasItem then
@@ -69,8 +69,8 @@ function OpenLocker(bankId, lockerId) -- Globally Used
             AttachEntityToEntity(drillObject, cache.ped, GetPedBoneIndex(cache.ped, 57005), 0.14, 0, -0.01, 90.0, -90.0, 180.0, true, true, false, true, 1, true)
             isDrilling = true
             if lib.progressBar({
-                duration = 25000,
-                label = Lang:t('general.breaking_open_safe'),
+                duration = 20000,
+                label = locale('general.breaking_open_safe'),
                 canCancel = true,
                 useWhileDead = false,
                 disable = {
@@ -87,25 +87,25 @@ function OpenLocker(bankId, lockerId) -- Globally Used
             }) then
                 DetachEntity(drillObject, true, true)
                 DeleteObject(drillObject)
-                TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isOpened', true)
-                TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
-                TriggerServerEvent('qb-bankrobbery:server:recieveItem', 'paleto', bankId, lockerId)
-                exports.qbx_core:Notify(Lang:t('success.success_message'), 'success')
+                TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isOpened', true)
+                TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+                TriggerServerEvent('qbx_bankrobbery:server:recieveItem', 'paleto', bankId, lockerId)
+                exports.qbx_core:Notify(locale('success.success_message'), 'success')
                 SetTimeout(500, function()
                     isDrilling = false
                 end)
             else
-                TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+                TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
                 DetachEntity(drillObject, true, true)
                 DeleteObject(drillObject)
-                exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
+                exports.qbx_core:Notify(locale('error.cancel_message'), 'error')
                 SetTimeout(500, function()
                     isDrilling = false
                 end)
             end
         else
-            exports.qbx_core:Notify(Lang:t('error.safe_too_strong'), 'error')
-            TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+            exports.qbx_core:Notify(locale('error.safe_too_strong'), 'error')
+            TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
         end
     elseif bankId == 'pacific' then
         local hasItem = exports.ox_inventory:Search('count', 'drill') > 0
@@ -114,8 +114,8 @@ function OpenLocker(bankId, lockerId) -- Globally Used
             AttachEntityToEntity(drillObject, cache.ped, GetPedBoneIndex(cache.ped, 57005), 0.14, 0, -0.01, 90.0, -90.0, 180.0, true, true, false, true, 1, true)
             isDrilling = true
             if lib.progressBar({
-                duration = 25000,
-                label = Lang:t('general.breaking_open_safe'),
+                duration = 20000,
+                label = locale('general.breaking_open_safe'),
                 canCancel = true,
                 useWhileDead = false,
                 disable = {
@@ -133,31 +133,31 @@ function OpenLocker(bankId, lockerId) -- Globally Used
                 DetachEntity(drillObject, true, true)
                 DeleteObject(drillObject)
 
-                TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isOpened', true)
-                TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
-                TriggerServerEvent('qb-bankrobbery:server:recieveItem', 'pacific', bankId, lockerId)
-                exports.qbx_core:Notify(Lang:t('success.success_message'), 'success')
+                TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isOpened', true)
+                TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+                TriggerServerEvent('qbx_bankrobbery:server:recieveItem', 'pacific', bankId, lockerId)
+                exports.qbx_core:Notify(locale('success.success_message'), 'success')
                 SetTimeout(500, function()
                     isDrilling = false
                 end)
             else
-                TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+                TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
                 DetachEntity(drillObject, true, true)
                 DeleteObject(drillObject)
-                exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
+                exports.qbx_core:Notify(locale('error.cancel_message'), 'error')
                 SetTimeout(500, function()
                     isDrilling = false
                 end)
             end
         else
-            exports.qbx_core:Notify(Lang:t('error.safe_too_strong'), 'error')
-            TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+            exports.qbx_core:Notify(locale('error.safe_too_strong'), 'error')
+            TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
         end
     else
         isDrilling = true
         if lib.progressBar({
-            duration = 32000,
-            label = Lang:t('general.breaking_open_safe'),
+            duration = 20000,
+            label = locale('general.breaking_open_safe'),
             canCancel = true,
             useWhileDead = false,
             disable = {
@@ -172,16 +172,16 @@ function OpenLocker(bankId, lockerId) -- Globally Used
                 flag = 1
             }
         }) then
-            TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isOpened', true)
-            TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
-            TriggerServerEvent('qb-bankrobbery:server:recieveItem', 'small', bankId, lockerId)
-            exports.qbx_core:Notify(Lang:t('success.success_message'), 'success')
+            TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isOpened', true)
+            TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+            TriggerServerEvent('qbx_bankrobbery:server:recieveItem', 'small', bankId, lockerId)
+            exports.qbx_core:Notify(locale('success.success_message'), 'success')
             SetTimeout(500, function()
                 isDrilling = false
             end)
         else
-            TriggerServerEvent('qb-bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
-            exports.qbx_core:Notify(Lang:t('error.cancel_message'), 'error')
+            TriggerServerEvent('qbx_bankrobbery:server:setLockerState', bankId, lockerId, 'isBusy', false)
+            exports.qbx_core:Notify(locale('error.cancel_message'), 'error')
             SetTimeout(500, function()
                 isDrilling = false
             end)
@@ -195,11 +195,11 @@ function OpenLocker(bankId, lockerId) -- Globally Used
     end)
 end
 
-RegisterNetEvent('qb-bankrobbery:client:robberyCall', function(type, coords)
+RegisterNetEvent('qbx_bankrobbery:client:robberyCall', function(type, coords)
     if not isLoggedIn or QBX.PlayerData.job.type ~= 'leo' or not QBX.PlayerData.job.onduty then return end
     if type == 'small' then
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
-        TriggerServerEvent('police:server:policeAlert', Lang:t('general.fleeca_robbery_alert'))
+        TriggerServerEvent('police:server:policeAlert', locale('general.fleeca_robbery_alert'))
     elseif type == 'paleto' then
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
@@ -208,7 +208,7 @@ RegisterNetEvent('qb-bankrobbery:client:robberyCall', function(type, coords)
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
         PlaySoundFrontend( -1, 'Beep_Red', 'DLC_HEIST_HACKING_SNAKE_SOUNDS', true)
-        TriggerServerEvent('police:server:policeAlert', Lang:t('general.paleto_robbery_alert'))
+        TriggerServerEvent('police:server:policeAlert', locale('general.paleto_robbery_alert'))
     elseif type == 'pacific' then
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
@@ -217,7 +217,7 @@ RegisterNetEvent('qb-bankrobbery:client:robberyCall', function(type, coords)
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
         PlaySoundFrontend( -1, 'Beep_Red', 'DLC_HEIST_HACKING_SNAKE_SOUNDS', true)
-        TriggerServerEvent('police:server:policeAlert', Lang:t('general.pacific_robbery_alert'))
+        TriggerServerEvent('police:server:policeAlert', locale('general.pacific_robbery_alert'))
     end
     local transG = 250
     local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
@@ -228,7 +228,7 @@ RegisterNetEvent('qb-bankrobbery:client:robberyCall', function(type, coords)
     SetBlipScale(blip, 1.2)
     SetBlipFlashes(blip, true)
     BeginTextCommandSetBlipName('STRING')
-    AddTextComponentString(Lang:t('general.bank_robbery_police_call'))
+    AddTextComponentString(locale('general.bank_robbery_police_call'))
     EndTextCommandSetBlipName(blip)
     while transG ~= 0 do
         Wait(180 * 4)

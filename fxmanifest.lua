@@ -7,22 +7,16 @@ version '1.0.0'
 
 ui_page 'html/index.html'
 
+ox_lib 'locale'
+
 shared_scripts {
     '@ox_lib/init.lua',
-    '@qbx_core/modules/utils.lua',
-    '@qb-core/shared/locale.lua',
-    'locales/en.lua',
-    'locales/*.lua'
+    '@qbx_core/modules/lib.lua'
 }
 
 client_scripts {
     '@qbx_core/modules/playerdata.lua',
-    'client/main.lua',
-    'client/fleeca.lua',
-    'client/pacific.lua',
-    'client/powerstation.lua',
-    'client/doors.lua',
-    'client/paleto.lua'
+    'client/*.lua'
 }
 
 server_scripts {
@@ -33,6 +27,7 @@ files {
     'config/client.lua',
     'config/shared.lua',
     'html/*',
+    'locales/*.json',
 }
 
 lua54 'yes'
