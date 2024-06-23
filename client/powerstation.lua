@@ -45,8 +45,7 @@ RegisterNetEvent('thermite:UseThermite', function()
         if dist < 1.5 then
             if CurrentCops >= config.minThermitePolice then
                 if not powerStationConfig[closestStation].hit then
-                    lib.requestAnimDict('weapon@w_sp_jerrycan')
-                    TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, 180, 49, 0, false, false, false)
+                    lib.playAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, 180, 49, 0, false, false, false)
                     SetNuiFocus(true, true)
                     SendNUIMessage({
                         action = 'openThermite',
@@ -65,8 +64,7 @@ RegisterNetEvent('thermite:UseThermite', function()
         TriggerServerEvent('evidence:server:CreateFingerDrop', pos)
         if CurrentCops >= config.minThermitePolice then
             currentGate = CurrentThermiteGate
-            lib.requestAnimDict('weapon@w_sp_jerrycan')
-            TaskPlayAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, -1, 49, 0, false, false, false)
+            lib.playAnim(cache.ped, 'weapon@w_sp_jerrycan', 'fire', 3.0, 3.9, -1, 49, 0, false, false, false)
             SetNuiFocus(true, true)
             SendNUIMessage({
                 action = 'openThermite',
