@@ -2,7 +2,6 @@ local config = require 'config.server'
 local sharedConfig = require 'config.shared'
 local robberyBusy = false
 local timeOut = false
-local ITEMS =  exports.ox_inventory:Items()
 
 --- This will convert a table's keys into an array
 --- @param tbl table
@@ -395,7 +394,7 @@ end)
 lib.callback.register('thermite:server:check', function(source)
     local player = exports.qbx_core:GetPlayer(source)
     if not player then return false end
-    if exports.ox_inventory:RemoveItem(src, 'thermite', 1) then
+    if exports.ox_inventory:RemoveItem(source, 'thermite', 1) then
         return true
     else
         return false
