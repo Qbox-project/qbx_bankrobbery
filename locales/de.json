@@ -1,0 +1,31 @@
+{
+    "success": {
+        "success_message": "Erfolgreich",
+        "fuses_are_blown": "Sprengladung gezündet",
+        "door_has_opened": "Die Tür wurde geöffnet"
+    },
+    "error": {
+        "cancel_message": "Abgebrochen",
+        "safe_too_strong": "Scheint als wäre das Schloss zu sicher...",
+        "missing_item": "Dir fehlt ein GEgenstand...",
+        "bank_already_open": "Bereits geöffnet...",
+        "minimum_police_required": "Mindestens %{police} Polizisten benötigt",
+        "security_lock_active": "Sicherheitsverriegelung aktiv, Tür öffnen nicht möglich!",
+        "wrong_type": "%{receiver} hat nicht den richtigen Befehl erhalten. '%{argument}'\nErhaltener Typ: %{receivedType}\nErhaltener Weert: %{receivedValue}\n Erwarteter Typ: %{expected}",
+        "fuses_already_blown": "Sprengladungen bereits gezündet...",
+        "event_trigger_wrong": "%{event}%{extraInfo} wurde ausgelöst während Bedingugen nicht erfüllt waren, Quelle: %{source}",
+        "missing_ignition_source": "Dir fehlt etwas zum Zünden"
+    },
+    "general": {
+        "breaking_open_safe": "Safe wird aufgebrochen...",
+        "connecting_hacking_device": "Hackinggerät wird verbunden...",
+        "fleeca_robbery_alert": "Die Fleeca Bank wird ausgeraubt",
+        "paleto_robbery_alert": "Die Blaine County Savings wird ausgeraubt",
+        "pacific_robbery_alert": "Die Pacific Standard Bank wird ausgeraubt",
+        "break_safe_open_option_target": "Safe aufbrechen",
+        "break_safe_open_option_drawtext": "[E] Den Safe aufbrechen",
+        "validating_bankcard": "Karte wird verifiziert...",
+        "thermite_detonating_in_seconds": "Thermit wird in %{time} Sekunden gezündet",
+        "bank_robbery_police_call": "10-90: Bankraub"
+    }
+}
