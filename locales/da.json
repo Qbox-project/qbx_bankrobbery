@@ -9,11 +9,11 @@
         "safe_too_strong": "Det ser ud til, at safelåsen er for stærk...",
         "missing_item": "Du mangler en genstand...",
         "bank_already_open": "Banken er allerede åben...",
-        "minimum_police_required": "Mindst %{police} politi er påkrævet",
+        "minimum_police_required": "Mindst %s politi er påkrævet",
         "security_lock_active": "Sikkerhedslåsen er aktiv, åbning af døren er i øjeblikket ikke mulig",
-        "wrong_type": "%{receiver} modtog ikke den rigtige type for argumentet '%{argument}'\nmodtaget type: %{receivedType}\nmodtaget værdi: %{receivedValue}\nforventet type: %{expected}",
+        "wrong_type": "%s modtog ikke den rigtige type for argumentet '%s'\nmodtaget type: %s\nmodtaget værdi: %s\nforventet type: %s",
         "fuses_already_blown": "Sikringerne er allerede sprunget...",
-        "event_trigger_wrong": "%{event}%{extraInfo} blev udløst, når nogle betingelser ikke blev opfyldt, kilde: %{source}",
+        "event_trigger_wrong": "%s%s blev udløst, når nogle betingelser ikke blev opfyldt, kilde: %s",
         "missing_ignition_source": "Du mangler en tændingskilde"
     },
     "general": {
@@ -25,7 +25,7 @@
         "break_safe_open_option_target": "Bryd sikkerhedsskabet op",
         "break_safe_open_option_drawtext": "[E] Bryd sikkerhedsskabet op",
         "validating_bankcard": "Validerer kort...",
-        "thermite_detonating_in_seconds": "Thermite går af om %{time} sekund(er)",
+        "thermite_detonating_in_seconds": "Thermite går af om %s sekund(er)",
         "bank_robbery_police_call": "10-90: Bankrøveri"
     }
 }
