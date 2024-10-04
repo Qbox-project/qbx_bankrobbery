@@ -9,11 +9,11 @@
         "safe_too_strong": "Parece que la cerradura de la caja fuerte es demasiado fuerte...",
         "missing_item": "Te falta un artículo...",
         "bank_already_open": "El banco ya está abierto...",
-        "minimum_police_required": "Se necesita un mínimo de %{police} policías",
+        "minimum_police_required": "Se necesita un mínimo de %s policías",
         "security_lock_active": "El bloqueo de seguridad está activo, actualmente no es posible abrir la puerta",
-        "wrong_type": "%{receiver} no ha recibido el tipo correcto para el argumento '%{argument}'\ntipo recibido: %{receivedType}\nvalor recibido: %{receivedValue}\ntipo esperado: %{expected}",
+        "wrong_type": "%s no ha recibido el tipo correcto para el argumento '%s'\ntipo recibido: %s\nvalor recibido: %s\ntipo esperado: %s",
         "fuses_already_blown": "Los fusibles ya están fundidos...",
-        "event_trigger_wrong": "%{event}%{extraInfo} se ha disparado al no cumplirse algunas condiciones, fuente: %{source}",
+        "event_trigger_wrong": "%s%s se ha disparado al no cumplirse algunas condiciones, fuente: %s",
         "missing_ignition_source": "Le falta una fuente de ignición"
     },
     "general": {
@@ -25,7 +25,7 @@
         "break_safe_open_target": "Romper caja fuerte abierta",
         "break_safe_open_option_drawtext": "[E] Romper la caja fuerte",
         "validating_bankcard": "Validando tarjeta...",
-        "thermite_detonating_in_seconds": "La termita estallará en %{time} segundo(s)",
+        "thermite_detonating_in_seconds": "La termita estallará en %s segundo(s)",
         "bank_robbery_police_call": "10-90: Robo de banco"
     }
   }

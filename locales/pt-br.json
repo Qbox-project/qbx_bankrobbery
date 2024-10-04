@@ -1,0 +1,31 @@
+{
+    "success": {
+        "success_message": "Sucesso",
+        "fuses_are_blown": "Os fusíveis foram queimados",
+        "door_has_opened": "A porta foi aberta"
+    },
+    "error": {
+        "cancel_message": "Cancelado",
+        "safe_too_strong": "Parece que o cofre está muito resistente...",
+        "missing_item": "Você está faltando um item...",
+        "bank_already_open": "O banco já está aberto...",
+        "minimum_police_required": "Mínimo de %s policiais necessários",
+        "security_lock_active": "A trava de segurança está ativa, abrir a porta atualmente não é possível",
+        "wrong_type": "%s não recebeu o tipo correto para o argumento '%s'\nrecebido tipo: %s\nvalor recebido: %s\n esperado tipo: %s",
+        "fuses_already_blown": "Os fusíveis já foram queimados...",
+        "event_trigger_wrong": "%s%s foi acionado quando algumas condições não foram atendidas, origem: %s",
+        "missing_ignition_source": "Você está sem uma fonte de ignição"
+    },
+    "general": {
+        "breaking_open_safe": "Abrindo o cofre...",
+        "connecting_hacking_device": "Conectando o dispositivo de hacking...",
+        "fleeca_robbery_alert": "Tentativa de assalto ao banco Fleeca",
+        "paleto_robbery_alert": "Tentativa de assalto ao banco Blaine County Savings",
+        "pacific_robbery_alert": "Tentativa de assalto ao banco Pacific Standard",
+        "break_safe_open_option_target": "Abrir Cofre",
+        "break_safe_open_option_drawtext": "[E] Abrir o cofre",
+        "validating_bankcard": "Validando cartão...",
+        "thermite_detonating_in_seconds": "A termita vai explodir em %s segundo(s)",
+        "bank_robbery_police_call": "10-90: Assalto ao Banco"
+    }
+}

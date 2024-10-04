@@ -9,11 +9,11 @@
         "safe_too_strong": "Scheint als wäre das Schloss zu sicher...",
         "missing_item": "Dir fehlt ein GEgenstand...",
         "bank_already_open": "Bereits geöffnet...",
-        "minimum_police_required": "Mindestens %{police} Polizisten benötigt",
+        "minimum_police_required": "Mindestens %s Polizisten benötigt",
         "security_lock_active": "Sicherheitsverriegelung aktiv, Tür öffnen nicht möglich!",
-        "wrong_type": "%{receiver} hat nicht den richtigen Befehl erhalten. '%{argument}'\nErhaltener Typ: %{receivedType}\nErhaltener Weert: %{receivedValue}\n Erwarteter Typ: %{expected}",
+        "wrong_type": "%s hat nicht den richtigen Befehl erhalten. '%s'\nErhaltener Typ: %s\nErhaltener Weert: %s\n Erwarteter Typ: %s",
         "fuses_already_blown": "Sprengladungen bereits gezündet...",
-        "event_trigger_wrong": "%{event}%{extraInfo} wurde ausgelöst während Bedingugen nicht erfüllt waren, Quelle: %{source}",
+        "event_trigger_wrong": "%s%s wurde ausgelöst während Bedingugen nicht erfüllt waren, Quelle: %s",
         "missing_ignition_source": "Dir fehlt etwas zum Zünden"
     },
     "general": {
@@ -25,7 +25,7 @@
         "break_safe_open_option_target": "Safe aufbrechen",
         "break_safe_open_option_drawtext": "[E] Den Safe aufbrechen",
         "validating_bankcard": "Karte wird verifiziert...",
-        "thermite_detonating_in_seconds": "Thermit wird in %{time} Sekunden gezündet",
+        "thermite_detonating_in_seconds": "Thermit wird in %s Sekunden gezündet",
         "bank_robbery_police_call": "10-90: Bankraub"
     }
 }

@@ -80,7 +80,7 @@ RegisterNetEvent('qbx_bankrobbery:client:BankSecurity', function(key, status)
     elseif type(key) == 'number' then
         sharedConfig.smallBanks[key].alarm = status
     else
-        error(locale('error.wrong_type', {receiver = 'qbx_bankrobbery:client:BankSecurity', argument = 'key', receivedType = type(key), receivedValue = key, expected = 'table/array'}))
+        error(locale('error.wrong_type', 'qbx_bankrobbery:client:BankSecurity', 'key', type(key), key, 'table/array'))
     end
 end)
 
