@@ -17,6 +17,10 @@ local function onHackDone(success)
     TriggerServerEvent('qbx_bankrobbery:server:setBankState', closestBank)
 end
 
+RegisterNetEvent('police:SetCopCount', function(amount)
+    CurrentCops = amount
+end)
+
 RegisterNetEvent('electronickit:UseElectronickit', function()
     DropFingerprint()
 
