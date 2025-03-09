@@ -1,0 +1,31 @@
+{
+  "success": {
+    "success_message": "Başarılı",
+    "fuses_are_blown": "Sigortalar atmış",
+    "door_has_opened": "Kapı açıldı"
+  },
+  "error": {
+    "cancel_message": "İptal edildi",
+    "safe_too_strong": "Görünüşe göre kasa kilidi çok güçlü...",
+    "missing_item": "Eksik bir eşyan var...",
+    "bank_already_open": "Banka zaten açık...",
+    "minimum_police_required": "En az %s polis gerekli",
+    "security_lock_active": "Güvenlik kilidi aktif, kapıyı açmak şu anda mümkün değil",
+    "wrong_type": "%s, '%s' argümanı için doğru türü almadı\nalınan tür: %s\nalınan değer: %s\nbeklenen tür: %s",
+    "fuses_already_blown": "Sigortalar zaten atılmış...",
+    "event_trigger_wrong": "%s%s, bazı koşullar sağlanmadığı halde tetiklendi, kaynak: %s",
+    "missing_ignition_source": "Bir ateşleme kaynağı eksik"
+  },
+  "general": {
+    "breaking_open_safe": "Kasayı zorla açılıyor...",
+    "connecting_hacking_device": "Hacking cihazı bağlanıyor...",
+    "fleeca_robbery_alert": "Fleeca banka soygunu girişimi",
+    "paleto_robbery_alert": "Blaine County Savings banka soygunu girişimi",
+    "pacific_robbery_alert": "Pacific Standard Bank soygunu girişimi",
+    "break_safe_open_option_target": "Kasayı Zorla Aç",
+    "break_safe_open_option_drawtext": "[E] Kasayı zorla aç",
+    "validating_bankcard": "Kart doğrulanıyor...",
+    "thermite_detonating_in_seconds": "Thermit, %s saniye içinde patlayacak",
+    "bank_robbery_police_call": "10-90: Banka Soygunu"
+  }
+}
