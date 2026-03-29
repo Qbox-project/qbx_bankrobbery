@@ -1,0 +1,31 @@
+{
+    "success": {
+        "success_message": "成功しました",
+        "fuses_are_blown": "ヒューズが飛びました",
+        "door_has_opened": "ドアが開きました"
+    },
+    "error": {
+        "cancel_message": "キャンセルしました",
+        "safe_too_strong": "金庫のロックが強すぎます...",
+        "missing_item": "必要なアイテムが不足しています...",
+        "bank_already_open": "銀行はすでに開いています...",
+        "minimum_police_required": "最低 %s 人の警察が必要です",
+        "security_lock_active": "セキュリティロックが有効なため、ドアを開けることができません",
+        "wrong_type": "%s は引数 '%s' に正しい型を受け取りませんでした\n受け取った型: %s\n受け取った値: %s\n期待される型: %s",
+        "fuses_already_blown": "ヒューズはすでに飛んでいます...",
+        "event_trigger_wrong": "%s%s は一部の条件が満たされていない状態でトリガーされました、ソース: %s",
+        "missing_ignition_source": "着火源が不足しています"
+    },
+    "general": {
+        "breaking_open_safe": "金庫をこじ開けています...",
+        "connecting_hacking_device": "ハッキングデバイスを接続中...",
+        "fleeca_robbery_alert": "フリーカ銀行強盗の試みが発生",
+        "paleto_robbery_alert": "ブレインカウンティー貯蓄銀行強盗の試みが発生",
+        "pacific_robbery_alert": "パシフィックスタンダード銀行強盗の試みが発生",
+        "break_safe_open_option_target": "金庫をこじ開ける",
+        "break_safe_open_option_drawtext": "[E] 金庫をこじ開ける",
+        "validating_bankcard": "カードを確認中...",
+        "thermite_detonating_in_seconds": "テルミットが %s 秒後に爆発します",
+        "bank_robbery_police_call": "10-90: 銀行強盗"
+    }
+}
