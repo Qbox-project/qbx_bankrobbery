@@ -52,7 +52,7 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
             flag = 1
         }
     }) then
-        TriggerServerEvent('qbx_bankrobbery:server:removeElectronicKit')
+        TriggerServerEvent('qbx_bankrobbery:server:removeElectronicKit', closestBank)
         TriggerEvent('mhacking:show')
         TriggerEvent('mhacking:start', math.random(6, 7), math.random(15, 30), onHackDone)
         if copsCalled or not sharedConfig.smallBanks[closestBank].alarm then return end

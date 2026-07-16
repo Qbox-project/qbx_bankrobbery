@@ -78,6 +78,7 @@ RegisterNetEvent('electronickit:UseElectronickit', function()
                             flag = 1
                         }
                     }) then
+                        TriggerServerEvent('qbx_bankrobbery:server:removeElectronicKit', 'pacific')
                         TriggerEvent('mhacking:show')
                         TriggerEvent('mhacking:start', math.random(5, 9), math.random(15, 30), onHackPacificDone)
                         if copsCalled or not pacificConfig.alarm then return end
