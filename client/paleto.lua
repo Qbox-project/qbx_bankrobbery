@@ -32,8 +32,8 @@ RegisterNetEvent('qbx_bankrobbery:UseBankcardA', function()
             flag = 1
         }
     }) then -- if completed
-        TriggerServerEvent('qbx_bankrobbery:server:setBankState', 'paleto')
         TriggerServerEvent('qbx_bankrobbery:server:removeBankCard', '01')
+        TriggerServerEvent('qbx_bankrobbery:server:setBankState', 'paleto')
 
         if copsCalled or not paletoConfig.alarm then return end
         TriggerServerEvent('qbx_bankrobbery:server:callCops', 'paleto', 0, paletoConfig.coords)

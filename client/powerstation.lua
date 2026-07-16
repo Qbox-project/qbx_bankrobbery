@@ -74,7 +74,6 @@ RegisterNetEvent('thermite:UseThermite', function()
                 action = 'openThermite',
                 amount = math.random(5, 10),
             })
-            TriggerServerEvent('qbx_bankrobbery:server:OpenGate', currentGate, false)
         else
             exports.qbx_core:Notify(locale('error.minium_police_required', {police = config.minThermitePolice}), 'error')
         end
@@ -91,7 +90,7 @@ RegisterNUICallback('thermiteclick', function(_, cb)
 end)
 
 RegisterNUICallback('thermitefailed', function(_, cb)
-    local success = lib.callback.await('thermite:server:check', false)
+    local success = lib.callback.await('thermite:server:check', false, false)
     if success then
         PlaySound(-1, 'Place_Prop_Fail', 'DLC_Dmod_Prop_Editor_Sounds', false, 0, true)
         ClearPedTasks(cache.ped)
@@ -103,7 +102,7 @@ RegisterNUICallback('thermitefailed', function(_, cb)
 end)
 
 RegisterNUICallback('thermitesuccess', function(_, cb)
-    local success = lib.callback.await('thermite:server:check', false)
+    local success = lib.callback.await('thermite:server:check', false, true)
     if success then
         ClearPedTasks(cache.ped)
         local time = 3
@@ -120,7 +119,7 @@ RegisterNUICallback('thermitesuccess', function(_, cb)
             TriggerServerEvent('qbx_bankrobbery:server:SetStationStatus', currentStation, true)
         elseif currentGate ~= 0 then
             exports.qbx_core:Notify(locale('success.door_has_opened'), 'success')
-            --Config.DoorlockAction(currentGate, false)
+            TriggerServerEvent('qbx_bankrobbery:server:OpenGate', currentGate, false)
             currentGate = 0
         end
     end

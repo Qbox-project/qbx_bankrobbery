@@ -1,7 +1,79 @@
 local config = require 'config.server'
+local clientConfig = require 'config.client'
 local sharedConfig = require 'config.shared'
 local robberyBusy = false
 local timeOut = false
+local bankAuthorizations = {}
+local gateAuthorizations = {}
+local thermiteAuthorizations = {}
+local lockerSessions = {}
+local robberyAlarms = {}
+
+local function getBank(bankId)
+    if bankId == 'paleto' or bankId == 'pacific' then
+        return sharedConfig.bigBanks[bankId], bankId
+    end
+
+    if type(bankId) ~= 'number' or bankId % 1 ~= 0 then return end
+    return sharedConfig.smallBanks[bankId], 'small'
+end
+
+local function getLocker(bankId, lockerId)
+    if type(lockerId) ~= 'number' or lockerId % 1 ~= 0 then return end
+
+    local bank, bankType = getBank(bankId)
+    local locker = bank and bank.lockers[lockerId]
+    if not locker then return end
+
+    return bank, locker, bankType
+end
+
+local function isPlayerNearCoords(source, coords, distance)
+    local ped = GetPlayerPed(source)
+    if ped == 0 then return false end
+
+    return #(GetEntityCoords(ped) - vec3(coords.x, coords.y, coords.z)) <= distance
+end
+
+local function getBankEntryCoords(bankId, bank)
+    if bankId == 'pacific' then return bank.coords[2] end
+    return bank.coords
+end
+
+local function hasRequiredPolice(bankType)
+    local required = bankType == 'paleto' and clientConfig.minPaletoPolice
+        or bankType == 'pacific' and clientConfig.minPacificPolice
+        or clientConfig.minFleecaPolice
+    local count = exports.qbx_core:GetDutyCountType('leo')
+    return count >= required
+end
+
+local function getThermiteTarget(coords)
+    for key, station in pairs(sharedConfig.powerStations) do
+        if #(coords - station.coords) <= 3.0 then
+            return 'station', key
+        end
+    end
+
+    for bankName, bank in pairs(sharedConfig.bigBanks) do
+        for i = 1, #bank.thermite do
+            local thermite = bank.thermite[i]
+            if #(coords - thermite.coords) <= 3.0 then
+                return 'gate', thermite.doorId, bankName
+            end
+        end
+    end
+end
+
+local function getDoorCoords(doorId)
+    if doorId == 6 then return sharedConfig.bigBanks.pacific.coords[1], 'card' end
+
+    for _, bank in pairs(sharedConfig.bigBanks) do
+        for i = 1, #bank.thermite do
+            if bank.thermite[i].doorId == doorId then return bank.thermite[i].coords, 'thermite' end
+        end
+    end
+end
 
 --- This will convert a table's keys into an array
 --- @param tbl table
@@ -105,19 +177,6 @@ local function allStationsHit()
     return hit >= config.hitsNeeded
 end
 
---- This will check if the given coords are in the area of the given distance of a powerstation
---- @param coords vector3
---- @param dist number
---- @return boolean
-local function isNearPowerStation(coords, dist)
-    for _, v in pairs(sharedConfig.powerStations) do
-        if #(coords - v.coords) < dist then
-            return true
-        end
-    end
-    return false
-end
-
 ---Changes the bank state
 ---@param bankId string | number
 ---@param state boolean
@@ -135,58 +194,77 @@ end
 
 RegisterNetEvent('qbx_bankrobbery:server:setBankState', function(bankId)
     if robberyBusy then return end
-    if bankId == 'paleto' then
-        if sharedConfig.bigBanks.paleto.isOpened or #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.paleto.coords) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setBankState', extraInfo = ' (paleto) ', source = source}))
-        end
-        sharedConfig.bigBanks.paleto.isOpened = true
-        TriggerEvent('qbx_bankrobbery:server:setTimeout')
-    elseif bankId == 'pacific' then
-        if sharedConfig.bigBanks.pacific.isOpened or #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.pacific.coords[2]) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setBankState', extraInfo = ' (pacific) ', source = source}))
-        end
-        sharedConfig.bigBanks.pacific.isOpened = true
-        TriggerEvent('qbx_bankrobbery:server:setTimeout')
-    else
-        if sharedConfig.smallBanks[bankId].isOpened or #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.smallBanks[bankId].coords) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setBankState', extraInfo = ' (smallbank '..bankId..') ', source = source}))
-        end
-        sharedConfig.smallBanks[bankId].isOpened = true
+    local bank, bankType = getBank(bankId)
+    local authorization = bankAuthorizations[source]
+    if not bank or bank.isOpened or not authorization or authorization.bankId ~= bankId
+        or authorization.expires < os.time() or not hasRequiredPolice(bankType)
+        or not isPlayerNearCoords(source, getBankEntryCoords(bankId, bank), 3.0) then return end
+
+    bankAuthorizations[source] = nil
+    bank.isOpened = true
+    if bankType == 'small' then
         TriggerEvent('qbx_bankrobbery:server:SetSmallBankTimeout', bankId)
+    else
+        TriggerEvent('qbx_bankrobbery:server:setTimeout')
     end
+
     TriggerClientEvent('qbx_bankrobbery:client:setBankState', -1, bankId)
     robberyBusy = true
-
-    local bankName = type(bankId) == 'number' and 'bankrobbery' or bankId
-    TriggerEvent('qb-scoreboard:server:SetActivityBusy', bankName, true)
-    if bankName ~= 'bankrobbery' then return end
-    TriggerEvent('qb-banking:server:SetBankClosed', bankId, true)
     changeBankState(bankId, true)
 end)
 
 RegisterNetEvent('qbx_bankrobbery:server:setLockerState', function(bankId, lockerId, state, bool)
-    if bankId == 'paleto' or bankId == 'pacific' then
-        if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks[bankId].lockers[lockerId].coords) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setLockerState', extraInfo = ' ('..bankId..') ', source = source}))
+    if (state ~= 'isBusy' and state ~= 'isOpened') or type(bool) ~= 'boolean' then return end
+
+    local bank, locker, bankType = getLocker(bankId, lockerId)
+    if not bank or not bank.isOpened or not isPlayerNearCoords(source, locker.coords, 3.0) then return end
+
+    local session = lockerSessions[locker]
+    if state == 'isBusy' then
+        if bool then
+            if locker.isOpened or locker.isBusy or session then return end
+            if bankType ~= 'small' and exports.ox_inventory:Search(source, 'count', 'drill') < 1 then return end
+
+            locker.isBusy = true
+            lockerSessions[locker] = {
+                source = source,
+                startedAt = os.time(),
+                bankId = bankId,
+                lockerId = lockerId
+            }
+        else
+            if not session or session.source ~= source or locker.isOpened then return end
+            locker.isBusy = false
+            lockerSessions[locker] = nil
         end
-        sharedConfig.bigBanks[bankId].lockers[lockerId][state] = bool
-    else
-        if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.smallBanks[bankId].lockers[lockerId].coords) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:setLockerState', extraInfo = ' (smallbank '..bankId..') ', source = source}))
-        end
-        sharedConfig.smallBanks[bankId].lockers[lockerId][state] = bool
+
+        TriggerClientEvent('qbx_bankrobbery:client:setLockerState', -1, bankId, lockerId, 'isBusy', locker.isBusy)
+        return
     end
-    TriggerClientEvent('qbx_bankrobbery:client:setLockerState', -1, bankId, lockerId, state, bool)
+
+    if not bool or not session or session.source ~= source or os.time() - session.startedAt < 15 then return end
+    if bankType ~= 'small' and exports.ox_inventory:Search(source, 'count', 'drill') < 1 then return end
+
+    locker.isOpened = true
+    locker.isBusy = false
+    locker.rewardOwner = source
+    lockerSessions[locker] = nil
+    TriggerClientEvent('qbx_bankrobbery:client:setLockerState', -1, bankId, lockerId, 'isOpened', true)
+    TriggerClientEvent('qbx_bankrobbery:client:setLockerState', -1, bankId, lockerId, 'isBusy', false)
 end)
 
-RegisterNetEvent('qbx_bankrobbery:server:recieveItem', function(type, bankId, lockerId)
+RegisterNetEvent('qbx_bankrobbery:server:recieveItem', function(rewardType, bankId, lockerId)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
-    if type == 'small' then
-        if #(GetEntityCoords(GetPlayerPed(src)) - sharedConfig.smallBanks[bankId].lockers[lockerId].coords) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:receiveItem', extraInfo = ' (smallbank '..bankId..') ', source = source}))
-        end
+
+    local bank, locker, bankType = getLocker(bankId, lockerId)
+    if not bank or rewardType ~= bankType or not bank.isOpened or not locker.isOpened or locker.rewardClaimed
+        or locker.rewardOwner ~= src or not isPlayerNearCoords(src, locker.coords, 3.0) then return end
+
+    locker.rewardClaimed = true
+    locker.rewardOwner = nil
+    if rewardType == 'small' then
         local itemType = math.random(#config.rewardTypes)
         local weaponChance = math.random(1, 50)
         local odd1 = math.random(1, 50)
@@ -208,10 +286,7 @@ RegisterNetEvent('qbx_bankrobbery:server:recieveItem', function(type, bankId, lo
         else
             exports.ox_inventory:AddItem(src, 'weapon_stungun', 1)
         end
-    elseif type == 'paleto' then
-        if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.paleto.lockers[lockerId].coords) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:receiveItem', extraInfo = ' (paleto) ', source = source}))
-        end
+    elseif rewardType == 'paleto' then
         local itemType = math.random(#config.rewardTypes)
         local tierChance = math.random(1, 100)
         local weaponChance = math.random(1, 10)
@@ -233,10 +308,7 @@ RegisterNetEvent('qbx_bankrobbery:server:recieveItem', function(type, bankId, lo
         else
             exports.ox_inventory:AddItem(src, 'weapon_vintagepistol', 1)
         end
-    elseif type == 'pacific' then
-        if #(GetEntityCoords(GetPlayerPed(source)) - sharedConfig.bigBanks.pacific.lockers[lockerId].coords) > 2.5 then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:receiveItem', extraInfo = ' (pacific) ', source = source}))
-        end
+    elseif rewardType == 'pacific' then
         local itemType = math.random(#config.rewardTypes)
         local weaponChance = math.random(1, 100)
         local odd1 = math.random(1, 100)
@@ -276,16 +348,26 @@ AddEventHandler('qbx_bankrobbery:server:setTimeout', function()
     CreateThread(function()
         SetTimeout(60000 * 90, function()
             for k in pairs(sharedConfig.bigBanks.pacific.lockers) do
-                sharedConfig.bigBanks.pacific.lockers[k].isBusy = false
-                sharedConfig.bigBanks.pacific.lockers[k].isOpened = false
+                local locker = sharedConfig.bigBanks.pacific.lockers[k]
+                locker.isBusy = false
+                locker.isOpened = false
+                locker.rewardClaimed = nil
+                locker.rewardOwner = nil
+                lockerSessions[locker] = nil
             end
             for k in pairs(sharedConfig.bigBanks.paleto.lockers) do
-                sharedConfig.bigBanks.paleto.lockers[k].isBusy = false
-                sharedConfig.bigBanks.paleto.lockers[k].isOpened = false
+                local locker = sharedConfig.bigBanks.paleto.lockers[k]
+                locker.isBusy = false
+                locker.isOpened = false
+                locker.rewardClaimed = nil
+                locker.rewardOwner = nil
+                lockerSessions[locker] = nil
             end
             TriggerClientEvent('qbx_bankrobbery:client:ClearTimeoutDoors', -1)
             sharedConfig.bigBanks.paleto.isOpened = false
             sharedConfig.bigBanks.pacific.isOpened = false
+            robberyAlarms.paleto = nil
+            robberyAlarms.pacific = nil
             timeOut = false
             robberyBusy = false
             changeBankState('paleto', false)
@@ -300,37 +382,54 @@ AddEventHandler('qbx_bankrobbery:server:SetSmallBankTimeout', function(bankId)
     CreateThread(function()
         SetTimeout(60000 * 30, function()
             for k in pairs(sharedConfig.smallBanks[bankId].lockers) do
-                sharedConfig.smallBanks[bankId].lockers[k].isOpened = false
-                sharedConfig.smallBanks[bankId].lockers[k].isBusy = false
+                local locker = sharedConfig.smallBanks[bankId].lockers[k]
+                locker.isOpened = false
+                locker.isBusy = false
+                locker.rewardClaimed = nil
+                locker.rewardOwner = nil
+                lockerSessions[locker] = nil
             end
             TriggerClientEvent('qbx_bankrobbery:client:ResetFleecaLockers', -1, bankId)
             timeOut = false
             robberyBusy = false
+            robberyAlarms[bankId] = nil
             changeBankState(bankId, false)
         end)
     end)
 end)
 
-RegisterNetEvent('qbx_bankrobbery:server:callCops', function(type, bank, coords)
-    if type == 'small' then
-        if not sharedConfig.smallBanks[bank].alarm then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:callCops', extraInfo = ' (smallbank '..bank..') ', source = source}))
-        end
-    elseif type == 'paleto' then
-        if not sharedConfig.bigBanks.paleto.alarm then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:callCops', extraInfo = ' (paleto) ', source = source}))
-        end
-    elseif type == 'pacific' then
-        if not sharedConfig.bigBanks.pacific.alarm then
-            return error(locale('error.event_trigger_wrong', {event = 'qbx_bankrobbery:server:callCops', extraInfo = ' (pacific) ', source = source}))
+RegisterNetEvent('qbx_bankrobbery:server:callCops', function(alertType, bankId)
+    local bank, bankType = getBank(alertType == 'small' and bankId or alertType)
+    local alarmId = bankType == 'small' and bankId or bankType
+    if not bank or alertType ~= bankType or not bank.alarm or robberyAlarms[alarmId]
+        or not isPlayerNearCoords(source, getBankEntryCoords(alarmId, bank), 15.0) then return end
+
+    robberyAlarms[alarmId] = true
+    local coords = GetEntityCoords(GetPlayerPed(source))
+    local players = exports.qbx_core:GetQBPlayers()
+    for _, player in pairs(players) do
+        if player.PlayerData.job.type == 'leo' and player.PlayerData.job.onduty then
+            TriggerClientEvent('qbx_bankrobbery:client:robberyCall', player.PlayerData.source, alertType, coords)
         end
     end
-    TriggerClientEvent('qbx_bankrobbery:client:robberyCall', -1, type, coords)
+
+    SetTimeout(clientConfig.outlawCooldown * 60000, function()
+        robberyAlarms[alarmId] = nil
+    end)
 end)
 
 RegisterNetEvent('qbx_bankrobbery:server:SetStationStatus', function(key, isHit)
-    sharedConfig.powerStations[key].hit = isHit
-    TriggerClientEvent('qbx_bankrobbery:client:SetStationStatus', -1, key, isHit)
+    if type(key) ~= 'number' or key % 1 ~= 0 or isHit ~= true then return end
+
+    local station = sharedConfig.powerStations[key]
+    local authorization = thermiteAuthorizations[source]
+    if not station or station.hit or not authorization or not authorization.canComplete
+        or authorization.kind ~= 'station' or authorization.id ~= key or authorization.expires < os.time()
+        or not isPlayerNearCoords(source, station.coords, 5.0) then return end
+
+    thermiteAuthorizations[source] = nil
+    station.hit = true
+    TriggerClientEvent('qbx_bankrobbery:client:SetStationStatus', -1, key, true)
     if allStationsHit() then
         exports['qb-weathersync']:setBlackout(true)
         TriggerClientEvent('qbx_bankrobbery:client:disableAllBankSecurity', -1)
@@ -347,38 +446,76 @@ RegisterNetEvent('qbx_bankrobbery:server:SetStationStatus', function(key, isHit)
     end
 end)
 
-RegisterNetEvent('qbx_bankrobbery:server:removeElectronicKit', function()
+RegisterNetEvent('qbx_bankrobbery:server:removeElectronicKit', function(bankId)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
-    if not player then return end
-    exports.ox_inventory:RemoveItem(src, 'electronickit', 1)
-    exports.ox_inventory:RemoveItem(src, 'trojan_usb', 1)
+    local bank, bankType = getBank(bankId)
+    if not player or not bank or bankType == 'paleto' or bank.isOpened or not hasRequiredPolice(bankType)
+        or not isPlayerNearCoords(src, getBankEntryCoords(bankId, bank), 3.0) then return end
+    if exports.ox_inventory:Search(src, 'count', 'electronickit') < 1
+        or exports.ox_inventory:Search(src, 'count', 'trojan_usb') < 1 then return end
+    if not exports.ox_inventory:RemoveItem(src, 'electronickit', 1) then return end
+    if not exports.ox_inventory:RemoveItem(src, 'trojan_usb', 1) then
+        exports.ox_inventory:AddItem(src, 'electronickit', 1)
+        return
+    end
+
+    bankAuthorizations[src] = { bankId = bankId, expires = os.time() + 300 }
 end)
 
 RegisterNetEvent('qbx_bankrobbery:server:removeBankCard', function(number)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
-    if not player then return end
-    exports.ox_inventory:RemoveItem(src, 'security_card_'..number, 1)
-end)
+    if not player or (number ~= '01' and number ~= '02') then return end
 
-RegisterNetEvent('thermite:StartServerFire', function(coords, maxChildren, isGasFire)
-    local src = source
-    local ped = GetPlayerPed(src)
-    local coords2 = GetEntityCoords(ped)
-    local thermiteCoords = sharedConfig.bigBanks.pacific.thermite[1].coords
-    local thermite2Coords = sharedConfig.bigBanks.pacific.thermite[2].coords
-    local thermite3Coords = sharedConfig.bigBanks.paleto.thermite[1].coords
-    if #(coords2 - thermiteCoords) < 10 or #(coords2 - thermite2Coords) < 10 or #(coords2 - thermite3Coords) < 10 or isNearPowerStation(coords2, 10) then
-        TriggerClientEvent('thermite:StartFire', -1, coords, maxChildren, isGasFire)
+    local bankId = number == '01' and 'paleto' or 'pacific'
+    local bank = sharedConfig.bigBanks[bankId]
+    local coords = number == '01' and bank.coords or bank.coords[1]
+    if bank.isOpened or not hasRequiredPolice(bankId) or not isPlayerNearCoords(src, coords, 3.0) then return end
+    if not exports.ox_inventory:RemoveItem(src, 'security_card_'..number, 1) then return end
+
+    if number == '01' then
+        bankAuthorizations[src] = { bankId = bankId, expires = os.time() + 30 }
+    else
+        gateAuthorizations[src] = { doorId = 6, expires = os.time() + 30 }
     end
 end)
 
+RegisterNetEvent('thermite:StartServerFire', function()
+    local src = source
+    local authorization = thermiteAuthorizations[src]
+    if not authorization or authorization.expires < os.time() or authorization.fireCount >= 7 then return end
+
+    local ped = GetPlayerPed(src)
+    if ped == 0 then return end
+
+    authorization.fireCount += 1
+    TriggerClientEvent('thermite:StartFire', -1, GetEntityCoords(ped), 24, false)
+end)
+
 RegisterNetEvent('qbx_bankrobbery:server:OpenGate', function(currentGate, state)
-    exports.ox_doorlock:setDoorState(currentGate, state)
+    if type(currentGate) ~= 'number' or state ~= false then return end
+
+    local coords, authorizationType = getDoorCoords(currentGate)
+    if not coords or not isPlayerNearCoords(source, coords, 5.0) then return end
+
+    if authorizationType == 'card' then
+        local authorization = gateAuthorizations[source]
+        if not authorization or authorization.doorId ~= currentGate or authorization.expires < os.time() then return end
+        gateAuthorizations[source] = nil
+    else
+        local authorization = thermiteAuthorizations[source]
+        if not authorization or not authorization.canComplete or authorization.kind ~= 'gate'
+            or authorization.id ~= currentGate or authorization.expires < os.time() then return end
+        thermiteAuthorizations[source] = nil
+    end
+
+    exports.ox_doorlock:setDoorState(currentGate, false)
 end)
 
 RegisterNetEvent('thermite:StopFires', function()
+    local authorization = thermiteAuthorizations[source]
+    if not authorization or authorization.expires < os.time() then return end
     TriggerClientEvent('thermite:StopFires', -1)
 end)
 
@@ -391,14 +528,24 @@ lib.callback.register('qbx_bankrobbery:server:GetConfig', function()
     return sharedConfig.powerStations, sharedConfig.bigBanks, sharedConfig.smallBanks
 end)
 
-lib.callback.register('thermite:server:check', function(source)
+lib.callback.register('thermite:server:check', function(source, succeeded)
     local player = exports.qbx_core:GetPlayer(source)
-    if not player then return false end
-    if exports.ox_inventory:RemoveItem(source, 'thermite', 1) then
-        return true
-    else
-        return false
-    end
+    local ped = GetPlayerPed(source)
+    if not player or ped == 0 or exports.ox_inventory:Search(source, 'count', 'lighter') < 1 then return false end
+
+    local kind, id = getThermiteTarget(GetEntityCoords(ped))
+    local policeCount = exports.qbx_core:GetDutyCountType('leo')
+    if not kind or policeCount < clientConfig.minThermitePolice then return false end
+    if not exports.ox_inventory:RemoveItem(source, 'thermite', 1) then return false end
+
+    thermiteAuthorizations[source] = {
+        kind = kind,
+        id = id,
+        canComplete = succeeded == true,
+        expires = os.time() + 60,
+        fireCount = 0
+    }
+    return true
 end)
 
 -- Items
@@ -429,4 +576,29 @@ exports.qbx_core:CreateUseableItem('electronickit', function(source)
     local player = exports.qbx_core:GetPlayer(source)
     if not player or not player.Functions.GetItemByName('electronickit') then return end
     TriggerClientEvent('electronickit:UseElectronickit', source)
+end)
+
+AddEventHandler('playerDropped', function()
+    bankAuthorizations[source] = nil
+    gateAuthorizations[source] = nil
+    thermiteAuthorizations[source] = nil
+
+    for locker, session in pairs(lockerSessions) do
+        if session.source == source then
+            locker.isBusy = false
+            lockerSessions[locker] = nil
+            TriggerClientEvent('qbx_bankrobbery:client:setLockerState', -1, session.bankId, session.lockerId, 'isBusy', false)
+        end
+    end
+
+    for _, bank in pairs(sharedConfig.smallBanks) do
+        for _, locker in pairs(bank.lockers) do
+            if locker.rewardOwner == source then locker.rewardOwner = nil end
+        end
+    end
+    for _, bank in pairs(sharedConfig.bigBanks) do
+        for _, locker in pairs(bank.lockers) do
+            if locker.rewardOwner == source then locker.rewardOwner = nil end
+        end
+    end
 end)
