@@ -199,7 +199,6 @@ RegisterNetEvent('qbx_bankrobbery:client:robberyCall', function(type, coords)
     if not isLoggedIn or QBX.PlayerData.job.type ~= 'leo' or not QBX.PlayerData.job.onduty then return end
     if type == 'small' then
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
-        TriggerServerEvent('police:server:policeAlert', locale('general.fleeca_robbery_alert'))
     elseif type == 'paleto' then
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
@@ -208,7 +207,6 @@ RegisterNetEvent('qbx_bankrobbery:client:robberyCall', function(type, coords)
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
         PlaySoundFrontend( -1, 'Beep_Red', 'DLC_HEIST_HACKING_SNAKE_SOUNDS', true)
-        TriggerServerEvent('police:server:policeAlert', locale('general.paleto_robbery_alert'))
     elseif type == 'pacific' then
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
@@ -217,7 +215,6 @@ RegisterNetEvent('qbx_bankrobbery:client:robberyCall', function(type, coords)
         PlaySound(-1, 'Lose_1st', 'GTAO_FM_Events_Soundset', false, 0, true)
         Wait(100)
         PlaySoundFrontend( -1, 'Beep_Red', 'DLC_HEIST_HACKING_SNAKE_SOUNDS', true)
-        TriggerServerEvent('police:server:policeAlert', locale('general.pacific_robbery_alert'))
     end
     local transG = 250
     local blip = AddBlipForCoord(coords.x, coords.y, coords.z)

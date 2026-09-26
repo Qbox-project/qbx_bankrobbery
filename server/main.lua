@@ -8,6 +8,11 @@ local gateAuthorizations = {}
 local thermiteAuthorizations = {}
 local lockerSessions = {}
 local robberyAlarms = {}
+local robberyAlertLocales = {
+    small = 'general.fleeca_robbery_alert',
+    paleto = 'general.paleto_robbery_alert',
+    pacific = 'general.pacific_robbery_alert',
+}
 
 local function getBank(bankId)
     if bankId == 'paleto' or bankId == 'pacific' then
@@ -412,6 +417,7 @@ RegisterNetEvent('qbx_bankrobbery:server:callCops', function(alertType, bankId)
             TriggerClientEvent('qbx_bankrobbery:client:robberyCall', player.PlayerData.source, alertType, coords)
         end
     end
+    TriggerEvent('police:server:policeAlert', locale(robberyAlertLocales[alertType]), nil, source)
 
     SetTimeout(clientConfig.outlawCooldown * 60000, function()
         robberyAlarms[alarmId] = nil
