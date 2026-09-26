@@ -424,8 +424,7 @@ RegisterNetEvent('qbx_bankrobbery:server:SetStationStatus', function(key, isHit)
     local station = sharedConfig.powerStations[key]
     local authorization = thermiteAuthorizations[source]
     if not station or station.hit or not authorization or not authorization.canComplete
-        or authorization.kind ~= 'station' or authorization.id ~= key or authorization.expires < os.time()
-        or not isPlayerNearCoords(source, station.coords, 5.0) then return end
+        or authorization.kind ~= 'station' or authorization.id ~= key or authorization.expires < os.time() then return end
 
     thermiteAuthorizations[source] = nil
     station.hit = true
@@ -487,19 +486,20 @@ RegisterNetEvent('thermite:StartServerFire', function()
     if not authorization or authorization.expires < os.time() or authorization.fireCount >= 7 then return end
 
     local ped = GetPlayerPed(src)
-    if ped == 0 then return end
+    if ped == 0 or not isPlayerNearCoords(src, authorization.coords, 20.0) then return end
 
     authorization.fireCount += 1
-    TriggerClientEvent('thermite:StartFire', -1, GetEntityCoords(ped), 24, false)
+    TriggerClientEvent('thermite:StartFire', -1, authorization.coords, 24, false)
 end)
 
 RegisterNetEvent('qbx_bankrobbery:server:OpenGate', function(currentGate, state)
     if type(currentGate) ~= 'number' or state ~= false then return end
 
     local coords, authorizationType = getDoorCoords(currentGate)
-    if not coords or not isPlayerNearCoords(source, coords, 5.0) then return end
+    if not coords then return end
 
     if authorizationType == 'card' then
+        if not isPlayerNearCoords(source, coords, 5.0) then return end
         local authorization = gateAuthorizations[source]
         if not authorization or authorization.doorId ~= currentGate or authorization.expires < os.time() then return end
         gateAuthorizations[source] = nil
@@ -543,7 +543,8 @@ lib.callback.register('thermite:server:check', function(source, succeeded)
         id = id,
         canComplete = succeeded == true,
         expires = os.time() + 60,
-        fireCount = 0
+        fireCount = 0,
+        coords = GetEntityCoords(ped),
     }
     return true
 end)
